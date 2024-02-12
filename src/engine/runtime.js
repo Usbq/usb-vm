@@ -1571,7 +1571,7 @@ class Runtime extends EventEmitter {
     }
 
     /**
-     * Helper for _convertPlaceholdes which handles inline images which are a specialized case of block "arguments".
+     * Helper for _convertPlaceholders which handles inline images which are a specialized case of block "arguments".
      * @param {object} argInfo Metadata about the inline image as specified by the extension
      * @return {object} JSON blob for a scratch-blocks image field.
      * @private
@@ -1594,19 +1594,20 @@ class Runtime extends EventEmitter {
     }
 
     /**
-     * Helper for _convertPlaceholdes which handles variable fields which are a specialized case of block "arguments".
+     * Helper for _convertPlaceholders which handles variable fields which are a specialized case of block "arguments".
      * @param {object} argInfo Metadata about the inline image as specified by the extension
      * @return {object} JSON blob for a scratch-blocks variable field.
      * @private
      */
     _constructVariableJson (argInfo, placeholder) {
+        const variable = argInfo.variable;
         return {
             type: 'field_variable',
             name: placeholder,
             variableTypes:
                 // eslint-disable-next-line max-len
                 argInfo.variableTypes ? (Array.isArray(argInfo.variableTypes) ? argInfo.variableTypes : [argInfo.variableTypes]) : [''],
-            variable: (argInfo.variableTypes === 'broadcast_msg') ? 'message1' : null,
+            variable: variable ?? (argInfo.variableTypes === 'broadcast_msg') ? 'message1' : null;
             filter: argInfo.filter ?? []
         };
     }
