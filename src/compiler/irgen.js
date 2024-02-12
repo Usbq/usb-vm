@@ -694,15 +694,14 @@ class ScriptTreeGenerator {
     descendStackedBlock (block) {
         switch (block.opcode) {
         case 'control_all_at_once':
-            // In Scratch 3, this block behaves like "if 1 = 1"
+            // In Unsandboxed, attempts to run the script in 1 frame.
             return {
-                kind: 'control.if',
+                kind: 'control.allAtOnce',
                 condition: {
                     kind: 'constant',
                     value: true
                 },
-                whenTrue: this.descendSubstack(block, 'SUBSTACK'),
-                whenFalse: []
+                this.descendSubstack(block, 'SUBSTACK'),
             };
         case 'control_clear_counter':
             return {
