@@ -701,7 +701,7 @@ class ScriptTreeGenerator {
                     kind: 'constant',
                     value: true
                 },
-                this.descendSubstack(block, 'SUBSTACK'),
+                do: this.descendSubstack(block, 'SUBSTACK'),
             };
         case 'control_clear_counter':
             return {
