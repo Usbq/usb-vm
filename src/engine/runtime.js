@@ -1600,14 +1600,13 @@ class Runtime extends EventEmitter {
      * @private
      */
     _constructVariableJson (argInfo, placeholder) {
-        const variable = argInfo.variable;
         return {
             type: 'field_variable',
             name: placeholder,
             variableTypes:
                 // eslint-disable-next-line max-len
                 argInfo.variableTypes ? (Array.isArray(argInfo.variableTypes) ? argInfo.variableTypes : [argInfo.variableTypes]) : [''],
-            variable: variable ?? (argInfo.variableTypes === 'broadcast_msg') ? 'message1' : null,
+            variable: (argInfo.variableTypes === 'broadcast_msg') ? 'message1' : null,
             filter: argInfo.filter ?? []
         };
     }
