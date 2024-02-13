@@ -685,7 +685,7 @@ class Blocks {
 
             // Update block value
             if (!block.fields[args.name]) return;
-            if (typeof block.fields[args.name].variableTypes !== 'undefined') {
+            if (typeof block.fields[args.name].variableType !== 'undefined') {
                 // Get variable name using the id in args.value.
                 const variable = this.runtime.getEditingTarget().lookupVariableById(args.value);
                 if (variable) {
