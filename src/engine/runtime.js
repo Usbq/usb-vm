@@ -130,6 +130,23 @@ const ArgumentTypeMap = (() => {
     return map;
 })();
 
+const FieldTypeMap = (() => {
+    const map = {};
+    map[ArgumentType.ANGLE] = {
+        fieldName: "field_angle",
+    };
+    map[ArgumentType.NUMBER] = {
+        fieldName: "field_number",
+    };
+    map[ArgumentType.STRING] = {
+        fieldName: "field_input",
+    };
+    map[ArgumentType.NOTE] = {
+        fieldName: "field_note",
+    };
+    return map;
+})();
+
 /**
  * A pair of functions used to manage the cloud variable limit,
  * to be used when adding (or attempting to add) or removing a cloud variable.
@@ -1226,8 +1243,7 @@ class Runtime extends EventEmitter {
                 colour: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color1,
                 colourSecondary: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color2,
                 colourTertiary: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color3,
-                outputShape: menuInfo.acceptReporters ?
-                    ScratchBlocksConstants.OUTPUT_SHAPE_ROUND : ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE,
+                outputShape: ScratchBlocksConstants.OUTPUT_SHAPE_ROUND,
                 args0: [
                     {// to do: we could reimplement field_numberdropdown here really easily
                         type: menuInfo.acceptText ?
@@ -1639,7 +1655,7 @@ class Runtime extends EventEmitter {
         // check if this is not one of those cases. E.g. an inline image on a block.
         if (argTypeInfo.fieldType === 'field_image') {
             argJSON = this._constructInlineImageJson(argInfo);
-        } else if (argTypeInfo.fieldType === 'field_variable') {
+        } else if (argTypeInfo.fieldType === 'field_variable' &&) {
             argJSON = this._constructVariableJson(argInfo, placeholder);
         } else {
             // Construct input value
@@ -1666,7 +1682,15 @@ class Runtime extends EventEmitter {
             let fieldName;
             if (argInfo.menu) {
                 const menuInfo = context.categoryInfo.menuInfo[argInfo.menu];
-                if (menuInfo.acceptReporters) {
+
+                let acceptReporters = false;
+                if (typeof argInfo.acceptReporters !== "undefined") {
+                    acceptReporters = argInfo.acceptReporters;
+                } else if (typeof menuInfo.acceptReporters !== "undefined") {
+                    acceptReporters = menuInfo.acceptReporters;
+                }
+
+                if (acceptReporters) {
                     valueName = placeholder;
                     shadowType = this._makeExtensionMenuId(argInfo.menu, context.categoryInfo.id);
                     fieldName = argInfo.menu;
@@ -1677,6 +1701,11 @@ class Runtime extends EventEmitter {
                     shadowType = null;
                     fieldName = placeholder;
                 }
+            } else if (argInfo.acceptReporters === false && FieldTypeMap[argInfo.type]) {
+                argJSON.type = FieldTypeMap[argInfo.type].fieldName;
+                valueName = null;
+                shadowType = null;
+                fieldName = placeholder;
             } else {
                 valueName = placeholder;
                 shadowType = (argTypeInfo.shadow && argTypeInfo.shadow.type) || null;
