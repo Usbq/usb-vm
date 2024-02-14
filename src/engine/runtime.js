@@ -1234,20 +1234,23 @@ class Runtime extends EventEmitter {
     _buildMenuForScratchBlocks (menuName, menuInfo, categoryInfo) {
         const menuId = this._makeExtensionMenuId(menuName, categoryInfo.id);
         const menuItems = this._convertMenuItems(menuInfo.items);
+        const acceptInput = (menuInfo.acceptText || menuInfo.acceptNumber);
+        const type = menuInfo.acceptText ?
+            'field_textdropdown' : menuInfo.acceptNumber ?
+            'field_numberdropdown' : 'field_dropdown';
         return {
             json: {
                 message0: '%1',
                 type: menuId,
                 inputsInline: true,
                 output: 'String',
-                colour: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color1,
-                colourSecondary: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color2,
-                colourTertiary: menuInfo.acceptText ? '#FFFFFF' : categoryInfo.color3,
+                colour: acceptInput ? '#FFFFFF' : categoryInfo.color1,
+                colourSecondary: acceptInput ? '#FFFFFF' : categoryInfo.color2,
+                colourTertiary: acceptInput ? '#FFFFFF' : categoryInfo.color3,
                 outputShape: ScratchBlocksConstants.OUTPUT_SHAPE_ROUND,
                 args0: [
-                    {// to do: we could reimplement field_numberdropdown here really easily
-                        type: menuInfo.acceptText ?
-                            'field_textdropdown' : 'field_dropdown',
+                    {
+                        type,
                         name: menuName,
                         options: menuItems
                     }
