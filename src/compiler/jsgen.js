@@ -473,7 +473,7 @@ class JSGenerator {
             return new TypedInput(`${this.referenceVariable(node.list)}.value.length`, TYPE_NUMBER);
 
         case 'looks.effect':
-            return new TypedInput(`Math.round(target.effects[${this.referenceVariable(node.effect)}])`, TYPE_NUMBER);
+            return new TypedInput(`Math.round(target.effects[${sanitize(node.effect)}])`, TYPE_NUMBER);
         case 'looks.size':
             return new TypedInput('Math.round(target.size)', TYPE_NUMBER);
         case 'looks.backdropName':
