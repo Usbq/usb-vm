@@ -69,7 +69,7 @@ class Mouse {
                 this.runtime.stageWidth * ((data.x / data.canvasWidth) - 0.5),
                 -(this.runtime.stageWidth / 2),
                 (this.runtime.stageWidth / 2)
-            );
+            ) + this.runtime.cameraX;
         }
         if (typeof data.y === 'number') {
             this._clientY = data.y;
@@ -77,7 +77,7 @@ class Mouse {
                 -this.runtime.stageHeight * ((data.y / data.canvasHeight) - 0.5),
                 -(this.runtime.stageHeight / 2),
                 (this.runtime.stageHeight / 2)
-            );
+            ) + this.runtime.cameraY;
         }
         if (typeof data.isDown !== 'undefined') {
             // If no button specified, default to left button for compatibility
