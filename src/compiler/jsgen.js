@@ -472,6 +472,8 @@ class JSGenerator {
         case 'list.length':
             return new TypedInput(`${this.referenceVariable(node.list)}.value.length`, TYPE_NUMBER);
 
+        case 'looks.effect':
+            return new TypedInput('Math.round(target)', TYPE_NUMBER);
         case 'looks.size':
             return new TypedInput('Math.round(target.size)', TYPE_NUMBER);
         case 'looks.backdropName':
@@ -485,6 +487,8 @@ class JSGenerator {
 
         case 'motion.direction':
             return new TypedInput('target.direction', TYPE_NUMBER);
+        case 'motion.rotationStyle':
+            return new TypedInput('target.rotationStyle', TYPE_NUMBER);
         case 'motion.x':
             return new TypedInput('limitPrecision(target.x)', TYPE_NUMBER);
         case 'motion.y':
@@ -593,6 +597,8 @@ class JSGenerator {
         }
         case 'op.letterOf':
             return new TypedInput(`((${this.descendInput(node.string).asString()})[(${this.descendInput(node.letter).asNumber()} | 0) - 1] || "")`, TYPE_STRING);
+        case 'op.lettersOf':
+            return new TypedInput(`((${this.descendInput(node.string).asString()}).substring(${this.descendInput(node.letter1).asNumber()}, ${this.descendInput(node.letter2).asNumber()}) || "")`, TYPE_STRING);
         case 'op.ln':
             // Needs to be marked as NaN because Math.log(-1) == NaN
             return new TypedInput(`Math.log(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER_NAN);
@@ -610,6 +616,8 @@ class JSGenerator {
             return new TypedInput(`!${this.descendInput(node.operand).asBoolean()}`, TYPE_BOOLEAN);
         case 'op.or':
             return new TypedInput(`(${this.descendInput(node.left).asBoolean()} || ${this.descendInput(node.right).asBoolean()})`, TYPE_BOOLEAN);
+        case 'op.xor':
+            return new TypedInput(`(${this.descendInput(node.left).asBoolean()} !== ${this.descendInput(node.right).asBoolean()})`, TYPE_BOOLEAN);
         case 'op.random':
             if (node.useInts) {
                 // Both inputs are ints, so we know neither are NaN
