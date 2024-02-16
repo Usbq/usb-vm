@@ -309,8 +309,8 @@ class VirtualMachine extends EventEmitter {
         this.runtime.setStageSize(width, height);
     }
 
-    setCameraXY (x, y) {
-        this.runtime.setCameraXY(x, y);
+    setCamera (x, y, direction, zoom) {
+        this.runtime.setCamera(x, y, direction, zoom);
     }
 
     setInEditor (inEditor) {
