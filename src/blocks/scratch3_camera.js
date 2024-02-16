@@ -21,7 +21,7 @@ class Scratch3CameraBlocks {
         };
     }
 
-    goToXY (args, util) {
+    moveToXY (args, util) {
         const x = Cast.toNumber(args.X);
         const y = Cast.toNumber(args.Y);
         this.runtime.setCamera(x, y);
