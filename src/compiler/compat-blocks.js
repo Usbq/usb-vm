@@ -6,6 +6,9 @@
 // Please keep these lists alphabetical.
 
 const stacked = [
+    // usb to do: compile these when working
+    'camera_movetoxy',
+
     'looks_changestretchby',
     'looks_hideallsprites',
     'looks_say',
