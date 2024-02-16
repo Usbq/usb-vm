@@ -13,8 +13,6 @@ const stacked = [
     'camera_changex',
     'camera_sety',
     'camera_changey',
-    'camera_xposition',
-    'camera_yposition',
 
     'looks_changestretchby',
     'looks_hideallsprites',
