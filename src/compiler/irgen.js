@@ -662,6 +662,15 @@ class ScriptTreeGenerator {
                 kind: 'sensing.username'
             };
 
+        case 'camera_xposition':
+            return {
+                kind: 'camera.x'
+            };
+        case 'camera_yposition':
+            return {
+                kind: 'camera.y'
+            };
+
         case 'sound_sounds_menu':
             // This menu is special compared to other menus -- it actually has an opcode function.
             return {
