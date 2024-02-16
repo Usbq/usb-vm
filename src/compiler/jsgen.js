@@ -744,6 +744,11 @@ class JSGenerator {
         case 'sensing.year':
             return new TypedInput(`(new Date().getFullYear())`, TYPE_NUMBER);
 
+        case 'camera.x':
+            return new TypedInput('runtime.camera.x', TYPE_NUMBER);
+        case 'camera.y':
+            return new TypedInput('runtime.camera.y', TYPE_NUMBER);
+
         case 'timer.get':
             return new TypedInput('runtime.ioDevices.clock.projectTimer()', TYPE_NUMBER);
 
