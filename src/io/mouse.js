@@ -121,7 +121,9 @@ class Mouse {
      * @return {number} Non-clamped X position of the mouse cursor.
      */
     getClientX () {
-        return this.runtime.renderer.translateX(this._clientX, true, 1, true, this._clientY, -1);
+        return this.runtime.renderer.translateX(
+            this._clientX, true, 1, true, this._clientY, -1
+        );
     }
 
     /**
@@ -129,7 +131,9 @@ class Mouse {
      * @return {number} Non-clamped Y position of the mouse cursor.
      */
     getClientY () {
-        return this.runtime.renderer.translateY(this._clientY, true, -1, true, this._clientX, 1);
+        return this.runtime.renderer.translateY(
+            this._clientY, true, -1, true, this._clientX, 1
+        );
     }
 
     /**
@@ -137,11 +141,11 @@ class Mouse {
      * @return {number} Clamped and integer rounded X position of the mouse cursor.
      */
     getScratchX () {
-        const x = this.runtime.renderer.translateX(this._scratchX, false, 1, true, this._scratchY, 1);
-        if (this.runtime.runtimeOptions.miscLimits) {
-            return Math.round(x);
-        }
-        return roundToThreeDecimals(x);
+        const x = this.roundValue(this._scratchX);
+        const y = this.roundValue(this._scratchY);
+        return this.runtime.renderer.translateX(
+            x, false, 1, true, y, 1
+        );
     }
 
     /**
@@ -149,11 +153,23 @@ class Mouse {
      * @return {number} Clamped and integer rounded Y position of the mouse cursor.
      */
     getScratchY () {
-        const y = this.runtime.renderer.translateY(this._scratchY, false, 1, true, this._scratchX, 1);
+        const x = this.roundValue(this._scratchX);
+        const y = this.roundValue(this._scratchY);
+        return this.runtime.renderer.translateY(
+            y, false, 1, true, x, 1
+        );
+    }
+
+    /**
+     * Round a mouse coordinate in relation to miscLimits.
+     * @param {number} float The mouse value that needs to be rounded.
+     * @return {number} Clamped and integer rounded Y position of the mouse cursor.
+     */
+    roundValue (float) {
         if (this.runtime.runtimeOptions.miscLimits) {
-            return Math.round(y);
+            return Math.round(float);
         }
-        return roundToThreeDecimals(y);
+        return roundToThreeDecimals(float);
     }
 
     /**
