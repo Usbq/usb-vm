@@ -65,54 +65,19 @@ class Mouse {
     postData (data) {
         if (typeof data.x === 'number') {
             // usb: transform based on camera
-            this._clientX = this.runtime.renderer.translateX(
-                data.x,
-                true,
-                1,
-                true,
-                this._clientY,
-                -1
-            );
-            const scratchX = MathUtil.clamp(
+            this._clientX = data.x;
+            this._scratchX = MathUtil.clamp(
                 this.runtime.stageWidth * ((data.x / data.canvasWidth) - 0.5),
                 -(this.runtime.stageWidth / 2),
                 (this.runtime.stageWidth / 2)
             );
-
-            // usb: transform based on camera
-            this._scratchX = this.runtime.renderer.translateX(
-                scratchX,
-                false,
-                1,
-                true,
-                this._scratchY,
-                1
-            );
         }
         if (typeof data.y === 'number') {
-            // usb: transform based on camera
-            this._clientY = this.runtime.renderer.translateY(
-                data.y,
-                true,
-                1,
-                true,
-                this.clientX,
-                -1
-            );
-            const scratchY = MathUtil.clamp(
+            this._clientY = data.y;
+            this._scratchY = MathUtil.clamp(
                 -this.runtime.stageHeight * ((data.y / data.canvasHeight) - 0.5),
                 -(this.runtime.stageHeight / 2),
                 (this.runtime.stageHeight / 2)
-            );
-
-            // usb: transform based on camera
-            this._scratchY = this.runtime.renderer.translateY(
-                scratchY,
-                false,
-                1,
-                true,
-                this._scratchX,
-                1
             );
         }
         if (typeof data.isDown !== 'undefined') {
@@ -156,7 +121,7 @@ class Mouse {
      * @return {number} Non-clamped X position of the mouse cursor.
      */
     getClientX () {
-        return this._clientX;
+        return this.runtime.renderer.translateX(this._clientX, true, 1, true, this._clientY, -1);
     }
 
     /**
@@ -164,7 +129,7 @@ class Mouse {
      * @return {number} Non-clamped Y position of the mouse cursor.
      */
     getClientY () {
-        return this._clientY;
+        return this.runtime.renderer.translateY(this._clientY, true, -1, true, this._clientX, 1);
     }
 
     /**
@@ -172,10 +137,11 @@ class Mouse {
      * @return {number} Clamped and integer rounded X position of the mouse cursor.
      */
     getScratchX () {
+        const x = this.runtime.renderer.translateX(this._scratchX, false, 1, true, this._scratchY, 1);
         if (this.runtime.runtimeOptions.miscLimits) {
-            return Math.round(this._scratchX);
+            return Math.round(x);
         }
-        return roundToThreeDecimals(this._scratchX);
+        return roundToThreeDecimals(x);
     }
 
     /**
@@ -183,10 +149,11 @@ class Mouse {
      * @return {number} Clamped and integer rounded Y position of the mouse cursor.
      */
     getScratchY () {
+        const y = this.runtime.renderer.translateY(this._scratchY, false, 1, true, this._scratchX, 1);
         if (this.runtime.runtimeOptions.miscLimits) {
-            return Math.round(this._scratchY);
+            return Math.round(y);
         }
-        return roundToThreeDecimals(this._scratchY);
+        return roundToThreeDecimals(y);
     }
 
     /**
