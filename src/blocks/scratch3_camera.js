@@ -50,7 +50,7 @@ class Scratch3CameraBlocks {
         const y = Cast.toNumber(args.Y);
         const newX = x + this.runtime.camera.x;
         const newY = y + this.runtime.camera.y;
-        this.runtime.setCamera(x, y);
+        this.runtime.setCamera(newX, newY);
     }
 
     setX (args, util) {
@@ -61,7 +61,7 @@ class Scratch3CameraBlocks {
     changeX (args, util) {
         const x = Cast.toNumber(args.X);
         const newX = x + this.runtime.camera.x;
-        this.runtime.setCamera(x);
+        this.runtime.setCamera(newX);
     }
 
     setY (args, util) {
@@ -72,7 +72,7 @@ class Scratch3CameraBlocks {
     changeY (args, util) {
         const y = Cast.toNumber(args.Y);
         const newY = y + this.runtime.camera.y;
-        this.runtime.setCamera(null, y);
+        this.runtime.setCamera(null, newY);
     }
 
     getCameraX (args, util) {
