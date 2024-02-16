@@ -69,9 +69,9 @@ class Mouse {
                 this.runtime.stageWidth * ((data.x / data.canvasWidth) - 0.5),
                 -(this.runtime.stageWidth / 2),
                 (this.runtime.stageWidth / 2)
-            ) + this.runtime.cameraX;
+            );
             // usb: transform based on camera
-            this._clientX = this.runtime.rendeer.translateX(
+            this._clientX = this.runtime.renderer.translateX(
                 this._clientX,
                 true,
                 1,
@@ -94,9 +94,9 @@ class Mouse {
                 -this.runtime.stageHeight * ((data.y / data.canvasHeight) - 0.5),
                 -(this.runtime.stageHeight / 2),
                 (this.runtime.stageHeight / 2)
-            ) + this.runtime.cameraY;
+            );
             // usb: transform based on camera
-            this._clientY = this.runtime.rendeer.translateY(
+            this._clientY = this.runtime.renderer.translateY(
                 this.clientY,
                 true,
                 1,
