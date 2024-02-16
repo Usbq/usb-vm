@@ -2849,7 +2849,7 @@ class Runtime extends EventEmitter {
             this.camera.zoom = zoom ?? this.camera.zoom;
 
             if (this.renderer) {
-                this.renderer.updateCamera(
+                this.renderer._updateCamera (
                     this.camera.x,
                     this.camera.y,
                     this.camera.direction,
