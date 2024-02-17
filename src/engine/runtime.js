@@ -2402,6 +2402,13 @@ class Runtime extends EventEmitter {
 
         this.ioDevices.cloud.clear();
 
+        this.camera = {
+            x: Runtime.CAMERA_X,
+            y: Runtime.CAMERA_Y,
+            direction: Runtime.CAMERA_DIRECTION,
+            zoom: Runtime.CAMERA_ZOOM
+        }
+
         // Reset runtime cloud data info
         const newCloudDataManager = cloudDataManager(this.cloudOptions);
         this.hasCloudData = newCloudDataManager.hasCloudVariables;
