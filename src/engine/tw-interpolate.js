@@ -62,6 +62,8 @@ const setupInitialState = runtime => {
  */
 const interpolate = (runtime, time) => {
     const renderer = runtime.renderer;
+    const camera = runtime.camera;
+
     if (!renderer) {
         return;
     }
