@@ -476,7 +476,9 @@ class Runtime extends EventEmitter {
             x: Runtime.CAMERA_X,
             y: Runtime.CAMERA_Y,
             direction: Runtime.CAMERA_DIRECTION,
-            zoom: Runtime.CAMERA_ZOOM
+            zoom: Runtime.CAMERA_ZOOM,
+            enabled: true,
+            interpolationData: null
         }
 
         this.runtimeOptions = {
@@ -2389,6 +2391,15 @@ class Runtime extends EventEmitter {
         this.emit(Runtime.RUNTIME_DISPOSED);
         this.ioDevices.clock.resetProjectTimer();
         this.fontManager.clear();
+
+        this.camera = {
+            x: Runtime.CAMERA_X,
+            y: Runtime.CAMERA_Y,
+            direction: Runtime.CAMERA_DIRECTION,
+            zoom: Runtime.CAMERA_ZOOM,
+            enabled: true,
+            interpolationData: null
+        }
         // @todo clear out extensions? turboMode? etc.
 
         // *********** Cloud *******************
@@ -2401,13 +2412,6 @@ class Runtime extends EventEmitter {
         }
 
         this.ioDevices.cloud.clear();
-
-        this.camera = {
-            x: Runtime.CAMERA_X,
-            y: Runtime.CAMERA_Y,
-            direction: Runtime.CAMERA_DIRECTION,
-            zoom: Runtime.CAMERA_ZOOM
-        }
 
         // Reset runtime cloud data info
         const newCloudDataManager = cloudDataManager(this.cloudOptions);

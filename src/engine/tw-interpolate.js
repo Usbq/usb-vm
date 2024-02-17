@@ -4,7 +4,31 @@
  */
 const setupInitialState = runtime => {
     const renderer = runtime.renderer;
+    const camera = runtime.camera;
 
+    // camera state
+    if (camera.enabled) {
+        // x, y, direction, zoom
+        if (renderer && camera.interpolationData) {
+            renderer._updateCamera(
+                camera.x,
+                camera.y,
+                camera.direction,
+                camera.zoom
+            );
+        }
+    
+        camera.interpolationData = {
+            x: camera.x,
+            y: camera.y,
+            direction: camera.direction,
+            zoom: camera.zoom
+        }
+    } else {
+        camera.interpolationData = null;
+    }
+
+    // target state(s)
     for (const target of runtime.targets) {
         const directionAndScale = target._getRenderedDirectionAndScale();
 
@@ -16,7 +40,7 @@ const setupInitialState = runtime => {
             renderer.updateDrawableEffect(drawableID, 'ghost', target.effects.ghost);
         }
 
-        if (target.visible && !target.isStage) {
+        if (target.visible && !target.isStage && target.interpolation) {
             target.interpolationData = {
                 x: target.x,
                 y: target.y,
@@ -42,6 +66,27 @@ const interpolate = (runtime, time) => {
         return;
     }
 
+    // camera state
+    if (camera.enabled && camera.interpolationData) {
+        const interpolationData = camera.interpolationData;
+
+        // Position interpolation.
+        const xDistance = camera.x - interpolationData.x;
+        const yDistance = camera.y - interpolationData.y;
+        const absoluteXDistance = Math.abs(xDistance);
+        const absoluteYDistance = Math.abs(yDistance);
+        if (absoluteXDistance > 0.1 || absoluteYDistance > 0.1) {
+            // Large movements are likely intended to be instantaneous.
+            const distance = Math.sqrt((absoluteXDistance ** 2) + (absoluteYDistance ** 2));
+            if (distance < 50) {
+                const newX = interpolationData.x + (xDistance * time);
+                const newY = interpolationData.y + (yDistance * time);
+                renderer._updateCamera(newX, newY, camera.direction, camera.zoom);
+            }
+        }
+    }
+
+    // target state(s)
     for (const target of runtime.targets) {
         // interpolationData is the initial state at the start of the frame (time 0)
         // the state on the target itself is the state at the end of the frame (time 1)
