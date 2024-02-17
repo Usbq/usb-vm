@@ -14,6 +14,8 @@ const MathUtil = require('../util/math-util');
  */
 class Camera extends EventEmitter {
     constructor(runtime) {
+        super();
+
         this.runtime = runtime;
 
         /**
