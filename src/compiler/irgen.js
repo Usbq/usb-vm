@@ -301,7 +301,7 @@ class ScriptTreeGenerator {
             };
         case 'looks_effect':
             return {
-                kind: 'looks.effect',
+                kind: 'looks.getEffect',
                 effect: this.descendInputOfBlock(block, 'EFFECT')
             };
 
