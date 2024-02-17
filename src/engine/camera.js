@@ -56,8 +56,8 @@ class Camera {
      * Event name for the camera updating.
      * @const {string}
      */
-    static get CAMERA_NEEDS_UPDATE () {
-        return 'CAMERA_NEEDS_UPDATE';
+    static get CAMERA_UPDATE () {
+        return 'CAMERA_UPDATE';
     }
 
     /**
