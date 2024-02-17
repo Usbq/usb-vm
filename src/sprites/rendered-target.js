@@ -414,6 +414,16 @@ class RenderedTarget extends Target {
     }
 
     /**
+     * Get a particular graphic effect value.
+     * @param {!string} effectName Name of effect (see `RenderedTarget.prototype.effects`).
+     * @return {!number} Numerical magnitude of effect.
+     */
+    getEffect (effectName) { // used by compiler
+        if (!Object.prototype.hasOwnProperty.call(this.effects, effectName)) return 0;
+        return this.effects[effectName];
+    }
+
+    /**
      * Clear all graphic effects on this rendered target.
      */
     clearEffects () { // used by compiler
