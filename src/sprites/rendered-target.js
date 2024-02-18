@@ -404,7 +404,7 @@ class RenderedTarget extends Target {
         if (!Object.prototype.hasOwnProperty.call(this.effects, effectName)) return;
 
         // "Infinity" is often used to get a monochrome effect.
-        if (effectName === 'color' && isFinite(value) {
+        if (effectName === 'color' && isFinite(value)) {
             value = MathUtil.wrapClamp(value, 0, 200);
         }
 
