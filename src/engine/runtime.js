@@ -133,6 +133,12 @@ const ArgumentTypeMap = (() => {
         fieldType: 'field_label_serializable',
         fieldName: 'LABEL'
     };
+    map[ArgumentType.PARAMETER] = {
+        shadow: {
+            type: 'argument_reporter_string_number',
+            fieldName: 'VALUE'
+        }
+    };
     return map;
 })();
 
@@ -1680,6 +1686,11 @@ class Runtime extends EventEmitter {
                 name: placeholder
             };
 
+            // TO DO: make it impossible to connect anything in here.
+            if (argInfo.type === ArgumentType.PARAMETER) {
+                argJSON.check = null;
+            }
+
             const defaultValue =
                 typeof argInfo.defaultValue === 'undefined' ? null :
                     maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();
@@ -2241,10 +2252,10 @@ class Runtime extends EventEmitter {
      * @param {!string} requestedHatOpcode Opcode of hats to start.
      * @param {object=} optMatchFields Optionally, fields to match on the hat.
      * @param {Target=} optTarget Optionally, a target to restrict to.
+     * @param {Target=} optParams Optionally, parameters to push onto the hat.
      * @return {Array.<Thread>} List of threads started by this function.
      */
-    startHats (requestedHatOpcode,
-        optMatchFields, optTarget) {
+    startHats (requestedHatOpcode, optMatchFields, optTarget, optParams) {
         if (!Object.prototype.hasOwnProperty.call(this._hats, requestedHatOpcode)) {
             // No known hat with this opcode.
             return;
@@ -2307,6 +2318,16 @@ class Runtime extends EventEmitter {
             // Start the thread with this top block.
             newThreads.push(this._pushThread(topBlockId, target));
         }, optTarget);
+
+        // If there are "hat parameters", push them
+        if (optParams) {
+            newThreads.forEach(thread => {
+                for (const param in optParams) {
+                    thread.pushParam(param, optParams.param);
+                }
+            });
+        }
+
         // For compatibility with Scratch 2, edge triggered hats need to be processed before
         // threads are stepped. See ScratchRuntime.as for original implementation
         newThreads.forEach(thread => {
