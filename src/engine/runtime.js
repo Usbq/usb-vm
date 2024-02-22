@@ -2333,16 +2333,18 @@ class Runtime extends EventEmitter {
             } else {
                 execute(this.sequencer, thread);
                 thread.goToNextBlock();
-
-                // If there are "hat parameters", push them
-                if (optParams) {
-                    thread.initParams();
-                    for (const param in optParams) {
-                        thread.pushParam(param, optParams[param]);
-                    }
-                }
             }
         });
+
+        // If there are "hat parameters", push them
+        if (optParams) {
+            newThreads.forEach(thread => {
+                thread.initParams();
+                for (const param in optParams) {
+                    thread.pushParam(param, optParams[param]);
+                }
+            });
+        }
 
         return newThreads;
     }
