@@ -311,9 +311,9 @@ class RenderedTarget extends Target {
             finalDirection = 90;
             const scaleFlip = (this.direction < 0) ? -1 : 1;
             finalScale = [scaleFlip * this.size, this.size];
-        } else if (this.rotationStyle === RenderedTarget.ROTATION_LOOKING) {
+        } else if (this.rotationStyle === RenderedTarget.ROTATION_STYLE_LOOKING) {
             const scaleFlip = (this.direction < 0) ? -1 : 1;
-            finalScale = [scaleFlip * this.size, this.size];
+            finalScale = [this.size, scaleFlip * this.size];
         }
         return {direction: finalDirection, scale: finalScale};
     }
