@@ -50,7 +50,7 @@ const inputs = [
     'sensing_loud',
     'sensing_loudness',
     'sensing_userid',
-    'sound_volume'
+    'sound_volume',
     
     // USB TO DO: MUST SUPPORT COMPILER
     'operator_letter_of',
