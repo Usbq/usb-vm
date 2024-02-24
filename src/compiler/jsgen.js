@@ -521,6 +521,8 @@ class JSGenerator {
             return new TypedInput(`((Math.atan(${this.descendInput(node.value).asNumber()}) * 180) / Math.PI)`, TYPE_NUMBER);
         case 'op.ceiling':
             return new TypedInput(`Math.ceil(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
+        case 'op.clamp':
+            return new TypedInput(`Math.min(Math.max(${this.descendInput(node.num).asNumber()}, ${this.descendInput(node.left).asNumber()}), ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER);
         case 'op.contains':
             return new TypedInput(`(${this.descendInput(node.string).asString()}.toLowerCase().indexOf(${this.descendInput(node.contains).asString()}.toLowerCase()) !== -1)`, TYPE_BOOLEAN);
         case 'op.cos':
@@ -551,6 +553,8 @@ class JSGenerator {
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareEqual(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
         }
+        case 'op.exponent':
+            return new TypedInput(`(${this.descendInput(node.left).asNumber()} ** ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER);
         case 'op.e^':
             return new TypedInput(`Math.exp(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
         case 'op.floor':
@@ -572,6 +576,11 @@ class JSGenerator {
             }
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareGreaterThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
+        }
+        case 'op.greaterEqual': {
+            const left = this.descendInput(node.left);
+            const right = this.descendInput(node.right);
+            return new TypedInput(`(${left.asUnknown()} >= ${right.asUnknown()})`, TYPE_BOOLEAN);
         }
         case 'op.join':
             return new TypedInput(`(${this.descendInput(node.left).asString()} + ${this.descendInput(node.right).asString()})`, TYPE_STRING);
@@ -595,6 +604,11 @@ class JSGenerator {
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareLessThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
         }
+        case 'op.lessEqual': {
+            const left = this.descendInput(node.left);
+            const right = this.descendInput(node.right);
+            return new TypedInput(`(${left.asUnknown()} <= ${right.asUnknown()})`, TYPE_BOOLEAN);
+        }
         case 'op.letterOf':
             return new TypedInput(`((${this.descendInput(node.string).asString()})[(${this.descendInput(node.letter).asNumber()} | 0) - 1] || "")`, TYPE_STRING);
         case 'op.lettersOf':
@@ -609,6 +623,10 @@ class JSGenerator {
             this.descendedIntoModulo = true;
             // Needs to be marked as NaN because mod(0, 0) (and others) == NaN
             return new TypedInput(`mod(${this.descendInput(node.left).asNumber()}, ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
+        case 'op.min':
+            return new TypedInput(`Math.min(${this.descendInput(node.left).asNumber()}, ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER);
+        case 'op.max':
+            return new TypedInput(`Math.max(${this.descendInput(node.left).asNumber()}, ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER);
         case 'op.multiply':
             // Needs to be marked as NaN because Infinity * 0 === NaN
             return new TypedInput(`(${this.descendInput(node.left).asNumber()} * ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
@@ -743,6 +761,31 @@ class JSGenerator {
             return new TypedInput('runtime.ioDevices.userData.getUsername()', TYPE_STRING);
         case 'sensing.year':
             return new TypedInput(`(new Date().getFullYear())`, TYPE_NUMBER);
+
+        case 'str.convert':
+            return new TypedInput(`runtime.ext_scratch3_string._convertString(${this.descendInput(node.left).asString()}, ${this.descendInput(node.right).asString()})`, TYPE_STRING);
+        case 'str.exactly':
+            return new TypedInput(`(${this.descendInput(node.left)} === ${this.descendInput(node.right)})`, TYPE_UNKNOWN);
+        case 'str.index':
+            return new TypedInput(`runtime.ext_scratch3_string._getNumberIndex(${this.descendInput(node.left).asString()}, ${this.descendInput(node.right).asString()}, ${this.descendInput(node.num).asNumber()})`, TYPE_NUMBER);
+        case 'str.is': {
+            const str = this.descendInput(node.left).asString();
+            if (this.descendInput(node.right).asString().toLowerCase() === "uppercase") {
+                return new TypedInput(`${str.toUpperCase() === str}`, TYPE_BOOLEAN);
+            } else {
+                return new TypedInput(`${str.toLowerCase() === str}`, TYPE_BOOLEAN);
+            }
+        }
+        case 'str.split':
+            return new TypedInput(`runtime.ext_scratch3_string._getIndexFromSplit(${this.descendInput(node.str).asString()}, ${this.descendInput(node.split).asString()}, ${this.descendInput(node.num).asNumber()})`, TYPE_STRING);
+        case 'str.repeat':
+            return new TypedInput(`(${this.descendInput(node.str).asString()}.repeat(${this.descendInput(node.num).asNumber()}))`, TYPE_STRING);
+        case 'str.replace':
+            return new TypedInput(`${this.descendInput(node.str).asString()}.replace(new RegExp(${this.descendInput(node.left).asString()}, "gi"), ${this.descendInput(node.right).asString()})`, TYPE_STRING);
+        case 'str.reverse':
+            return new TypedInput(`${this.descendInput(node.str).asString()}.split("").reverse().join("");`, TYPE_STRING);
+        case 'str.ternary':
+            return new TypedInput(`(${this.descendInput(node.operand).asString()}) ? ${this.descendInput(node.left).asString()} : ${this.descendInput(node.right).asString()}`, TYPE_UNKNOWN);
 
         case 'camera.x':
             return new TypedInput('runtime.camera.x', TYPE_NUMBER);
