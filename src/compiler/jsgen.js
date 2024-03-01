@@ -703,7 +703,7 @@ class JSGenerator {
         case 'sensing.daysSince2000':
             return new TypedInput('daysSince2000()', TYPE_NUMBER);
         case 'sensing.distance':
-            // TODO: on stages, this can be computed at compile time
+            // TODO: on stages and invalid values, this can be computed at compile time
             return new TypedInput(`distance(${this.descendInput(node.target).asString()})`, TYPE_NUMBER);
         case 'sensing.hour':
             return new TypedInput(`(new Date().getHours())`, TYPE_NUMBER);
