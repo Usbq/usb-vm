@@ -97,7 +97,7 @@ class Scratch3MotionBlocks {
         if (targetName === '_mouse_') {
             targetX = util.ioQuery('mouse', 'getScratchX');
             targetY = util.ioQuery('mouse', 'getScratchY');
-        } else if (args.TOWARDS === '_camera_') {
+        } else if (targetName === '_camera_') {
             targetX = this.runtime.camera.x;
             targetY = this.runtime.camera.y;
         } else if (targetName === '_random_') {
