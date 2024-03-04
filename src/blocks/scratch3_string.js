@@ -95,21 +95,23 @@ class Scratch3StringBlocks {
 
     itemSplit (args) { // usb
         const str = Cast.toString(args.STRING).toLowerCase();
-        const split = Cast.toString(args.SPLIT).toLowerCase();
+        const split = Cast.toString(args.SPLIT);
 
-        return this._getIndexFromSplit(str, split, args.INDEX);
+        return this._getItemFromSplit(str, split, args.INDEX);
     }
 
-    _getIndexFromSplit (string, split, index) { // used by compiler
+    _getItemFromSplit (string, split, index) { // used by compiler
+        const splitString = string.split(split);
+
         if (index === "last") {
-            index = string.length - 1;
+            index = splitString.length - 1;
         } else if (index === "random") {
-            index = Math.floor(Math.random()*string.length);
+            index = Math.floor(Math.random()*splitString.length);
         } else {
             index = Cast.toNumber(index) - 1;
         }
 
-        return string.split(split)[index] ?? 0;
+        return splitString[index] ?? "";
     }
 
     ternary (args) { // usb
@@ -142,23 +144,23 @@ class Scratch3StringBlocks {
         return this._getNumberIndex(find, str, args.INDEX);
     }
 
-    _getNumberIndex (find, string, index) { // used by compile
-        if (index === "last") {
-            index = string.length - 1;
-        } else if (index === "random") {
-            index = Math.floor(Math.random()*string.length);
-        } else {
-            index = Cast.toNumber(index) - 1;
-        }
-
-        const length = find.length - 1;
-        if (length > string) return 0;
+    _getNumberIndex (find, string, index) { // used by compiler
+        const length = find.length;
+        if (length > string.length) return 0;
 
         let occurences = [];
-        for (let i = 0; i > string.length; i++) {
+        for (let i = 0; i < string.length; i++) {
             if (string.substring(i, i + length) === find) {
                 occurences.push(i);
             }
+        }
+
+        if (index === "last") {
+            index = occurences.length - 1;
+        } else if (index === "random") {
+            index = Math.floor(Math.random()*occurences.length);
+        } else {
+            index = Cast.toNumber(index) - 1;
         }
 
         return occurences[index] ?? 0;
