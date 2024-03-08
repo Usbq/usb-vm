@@ -1631,9 +1631,8 @@ class Runtime extends EventEmitter {
         return {
             type: 'field_image',
             src: argInfo.dataURI || '',
-            // TODO these probably shouldn't be hardcoded...?
-            width: 24,
-            height: 24,
+            width: argInfo.width || 24,
+            height: argInfo.height || 24,
             // Whether or not the inline image should be flipped horizontally
             // in RTL languages. Defaults to false, indicating that the
             // image will not be flipped.
@@ -1643,7 +1642,7 @@ class Runtime extends EventEmitter {
 
     /**
      * Helper for _convertPlaceholders which handles variable fields which are a specialized case of block "arguments".
-     * @param {object} argInfo Metadata about the inline image as specified by the extension
+     * @param {object} argInfo Metadata about the variable dropdown as specified by the extension
      * @return {object} JSON blob for a scratch-blocks variable field.
      * @private
      */
@@ -1657,6 +1656,20 @@ class Runtime extends EventEmitter {
             // TO DO: default to an existing variable.
             variable: argInfo.variable ?? (argInfo.variableTypes === 'broadcast_msg') ? 'message1' : null,
             filter: argInfo.filter ?? []
+        };
+    }
+
+    /**
+     * Helper for _convertPlaceholders which handles label fields which are a specialized case of block "arguments".
+     * @param {object} argInfo Metadata about the label as specified by the extension
+     * @return {object} JSON blob for a scratch-blocks label field.
+     * @private
+     */
+    _constructLabelJson (argInfo, placeholder) {
+        return {
+            type: 'field_label_serializable',
+            name: placeholder,
+            text: argInfo.defaultValue,
         };
     }
 
@@ -1688,8 +1701,7 @@ class Runtime extends EventEmitter {
         if (argTypeInfo.fieldType === 'field_image') {
             argJSON = this._constructInlineImageJson(argInfo);
         } else if (argTypeInfo.fieldType === 'field_label_serializable') {
-            argJSON.type = 'field_label_serializable';
-            argJSON.text = argInfo.text;
+            argJSON = this._constructLabelJson(argInfo);
         } else if (argTypeInfo.fieldType === 'field_variable') {
             argJSON = this._constructVariableJson(argInfo, placeholder);
         } else {
