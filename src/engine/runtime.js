@@ -1687,8 +1687,8 @@ class Runtime extends EventEmitter {
         // check if this is not one of those cases. E.g. an inline image on a block.
         if (argTypeInfo.fieldType === 'field_image') {
             argJSON = this._constructInlineImageJson(argInfo);
-        } else if (argTypeInfo.fieldType === 'field_label') {
-            argJSON.type = 'field_label';
+        } else if (argTypeInfo.fieldType === 'field_label_serializable') {
+            argJSON.type = 'field_label_serializable';
             argJSON.text = argInfo.text;
         } else if (argTypeInfo.fieldType === 'field_variable') {
             argJSON = this._constructVariableJson(argInfo, placeholder);
