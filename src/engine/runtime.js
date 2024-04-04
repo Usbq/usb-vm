@@ -61,8 +61,12 @@ const COMMENT_CONFIG_MAGIC = ' // _twconfig_';
  * Information used for converting Scratch argument types into scratch-blocks data.
  * @type {object.<ArgumentType, {shadowType: string, fieldType: string}>}
  */
-const ArgumentTypeMap = (() => {
-    const map = {};
+this.ExtraArgumentTypeMap = {}, this.ExtraFieldTypeMap = {};
+let ArgumentTypeMap = {}, FieldTypeMap = {};
+this.UpdateTypeMaps = () => {
+    let map = {};
+    // ArgumentTypeMap
+    map = this.ExtraArgumentTypeMap;
     map[ArgumentType.ANGLE] = {
         shadow: {
             type: 'math_angle',
@@ -146,11 +150,9 @@ const ArgumentTypeMap = (() => {
             fieldName: 'VALUE'
         }
     };
-    return map;
-})();
-
-const FieldTypeMap = (() => {
-    const map = {};
+    ArgumentTypeMap = map;
+    // FieldTypeMap
+    map = this.ExtraFieldTypeMap;
     map[ArgumentType.ANGLE] = {
         fieldName: "field_angle",
     };
@@ -163,8 +165,10 @@ const FieldTypeMap = (() => {
     map[ArgumentType.NOTE] = {
         fieldName: "field_note",
     };
-    return map;
-})();
+    FieldTypeMap = map;
+    map = null;
+};
+this.UpdateTypeMaps();
 
 /**
  * A pair of functions used to manage the cloud variable limit,
