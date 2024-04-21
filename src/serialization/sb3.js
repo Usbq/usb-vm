@@ -793,7 +793,8 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     // We also add a couple more bits specific to Unsandboxed.
     const platformMeta = Object.create(null);
     platformMeta.name = "Unsandboxed";
-    platformMeta.version = "unsandboxed-alpha";
+    platformMeta.url = "https://unsandboxed.org/";
+    platformMeta.version = "alpha";
     meta.platform = platformMeta;
 
     // Attach full user agent string to metadata if available
