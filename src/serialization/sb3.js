@@ -789,6 +789,13 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
         meta.origin = runtime.origin;
     }
 
+    // USB: A few mods have agreed to list our platform's name inside of the project json.
+    // We also add a couple more bits specific to Unsandboxed.
+    const platformMeta = Object.create(null);
+    platformMeta.name = "Unsandboxed";
+    platformMeta.version = "unsandboxed-alpha";
+    meta.platform = platformMeta;
+
     // Attach full user agent string to metadata if available
     meta.agent = '';
     // TW: Never include full user agent to slightly improve user privacy
