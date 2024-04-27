@@ -21,7 +21,7 @@ const formatMessage = require('format-message');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
-const BLE = require('./engine/ble');
+const BLE = require('./io/ble');
 const BT = require('./io/bt');
 
 const {loadCostume} = require('./import/load-costume.js');
