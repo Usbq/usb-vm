@@ -75,8 +75,8 @@ class VirtualMachine extends EventEmitter {
         });
 
         this.io = {
-            ble,
-            bt
+            BLE,
+            BT
         }
 
         /**
