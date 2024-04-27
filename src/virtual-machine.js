@@ -21,6 +21,9 @@ const formatMessage = require('format-message');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
+const BLE = require('./engine/ble');
+const BT = require('./io/bt');
+
 const {loadCostume} = require('./import/load-costume.js');
 const {loadSound} = require('./import/load-sound.js');
 const {serializeSounds, serializeCostumes} = require('./serialization/serialize-assets');
@@ -70,6 +73,11 @@ class VirtualMachine extends EventEmitter {
         centralDispatch.setService('runtime', createRuntimeService(this.runtime)).catch(e => {
             log.error(`Failed to register runtime service: ${JSON.stringify(e)}`);
         });
+
+        this.io = {
+            ble,
+            bt
+        }
 
         /**
          * The "currently editing"/selected target ID for the VM.
