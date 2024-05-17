@@ -383,6 +383,16 @@ class ExtensionManager {
     }
 
     /**
+     * Modify the provided text as necessary to ensure that it may be used as an attribute value in valid XML.
+     * @param {string} text - the text to be sanitized
+     * @returns {string} - the sanitized text
+     * @private
+     */
+    _sanitizeID (text) {
+        return text.toString().replace(/[<"&]/, '_');
+    }
+
+    /**
      * Apply minor cleanup and defaults for optional extension fields.
      * TODO: make the ID unique in cases where two copies of the same extension are loaded.
      * @param {string} serviceName - the name of the service hosting this extension block
@@ -533,6 +543,19 @@ class ExtensionManager {
             arguments: {}
         }, blockInfo);
         blockInfo.text = blockInfo.text || blockInfo.opcode;
+
+        if (blockInfo.customContextMenu && blockInfo.customContextMenu.length > 0) {
+            // Replace all the string callback names of the context menu items
+            // with the actual function call.
+            blockInfo.customContextMenu = blockInfo.customContextMenu.map(contextMenuOption => {
+                if (typeof contextMenuOption.callback === 'string') {
+                    const callbackName = this._sanitizeID(contextMenuOption.callback);
+                    contextMenuOption.callback = args =>
+                        dispatch.call(serviceName, callbackName, args);
+                }
+                return contextMenuOption;
+            });
+        }
 
         switch (blockInfo.blockType) {
         case BlockType.EVENT:
