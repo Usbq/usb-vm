@@ -536,10 +536,7 @@ const serializeVariables = function (variables) {
             continue;
         }
         if (v.type === Variable.LIST_TYPE) {
-            obj.lists[varId] = [
-                v.name, 
-                makeSafeForJSON(v.value), 
-            ];
+            obj.lists[varId] = [v.name, makeSafeForJSON(v.value)];
             continue;
         }
 
@@ -1251,9 +1248,7 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
             const newList = new Variable(
                 listId,
                 list[0],
-                Variable.LIST_TYPE,
-                false,
-                list[3],
+                Variable.LIST_TYPE
             );
             newList.value = list[1];
             target.variables[newList.id] = newList;
