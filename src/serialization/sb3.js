@@ -539,8 +539,6 @@ const serializeVariables = function (variables) {
             obj.lists[varId] = [
                 v.name, 
                 makeSafeForJSON(v.value), 
-                false, 
-                v.locked
             ];
             continue;
         }
@@ -696,7 +694,6 @@ const serializeMonitors = function (monitors, runtime, extensions) {
                 value: Array.isArray(monitorData.value) ? [] : 0,
                 width: monitorData.width,
                 height: monitorData.height,
-                locked: monitorData.locked,
                 x: monitorData.x - xOffset,
                 y: monitorData.y - yOffset,
                 visible: monitorData.visible
@@ -1445,7 +1442,6 @@ const deserializeMonitor = function (monitorData, runtime, targets, extensions) 
         } else if (monitorData.opcode === 'data_listcontents') {
             const field = monitorBlock.fields.LIST;
             field.id = monitorData.id;
-            field.locked = monitorData = monitorData.locked;
             field.variableType = Variable.LIST_TYPE;
         }
 
