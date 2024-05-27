@@ -699,6 +699,7 @@ const serializeMonitors = function (monitors, runtime, extensions) {
                 serializedMonitor.sliderMin = monitorData.sliderMin;
                 serializedMonitor.sliderMax = monitorData.sliderMax;
                 serializedMonitor.isDiscrete = monitorData.isDiscrete;
+                serializedMonitor.locked = monitorData.locked;
             }
             return serializedMonitor;
         })
