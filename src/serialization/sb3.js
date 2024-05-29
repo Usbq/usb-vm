@@ -1351,7 +1351,7 @@ const deserializeMonitor = function (monitorData, runtime, targets, extensions) 
     }
 
     // Get information about this monitor, if it exists, given the monitor's opcode.
-    // This will be undefined for extension blocks
+    // This will be undefined for extension blocks.
     const monitorBlockInfo = runtime.monitorBlockInfo[monitorData.opcode];
 
     // Due to a bug (see https://github.com/scratchfoundation/scratch-vm/pull/2322), renamed list monitors may have been serialized
