@@ -45,7 +45,6 @@ const INPUT_DIFF_BLOCK_SHADOW = 3; // obscured shadow
 // Constants used during deserialization of an SB3 file
 const CORE_EXTENSIONS = [
     'argument',
-    'camera',
     'colour',
     'control',
     'data',
@@ -56,7 +55,6 @@ const CORE_EXTENSIONS = [
     'operator',
     'procedures',
     'sensing',
-    'string',
     'sound'
 ];
 
@@ -1240,7 +1238,8 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
             const newList = new Variable(
                 listId,
                 list[0],
-                Variable.LIST_TYPE
+                Variable.LIST_TYPE,
+                false
             );
             newList.value = list[1];
             target.variables[newList.id] = newList;
@@ -1351,7 +1350,7 @@ const deserializeMonitor = function (monitorData, runtime, targets, extensions) 
     }
 
     // Get information about this monitor, if it exists, given the monitor's opcode.
-    // This will be undefined for extension blocks.
+    // This will be undefined for extension blocks
     const monitorBlockInfo = runtime.monitorBlockInfo[monitorData.opcode];
 
     // Due to a bug (see https://github.com/scratchfoundation/scratch-vm/pull/2322), renamed list monitors may have been serialized
