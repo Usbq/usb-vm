@@ -433,8 +433,6 @@ class JSGenerator {
         case 'addons.call':
             return new TypedInput(`(${this.descendAddonCall(node)})`, TYPE_UNKNOWN);
 
-        case 'args.stringNumber':
-            return new TypedInput(`p${node.index}`, TYPE_UNKNOWN);
         case 'args.parameter':
             return new TypedInput(`(thread.getParam("${node.name}") ?? 0)`, TYPE_UNKNOWN);
 
