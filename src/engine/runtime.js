@@ -2873,8 +2873,9 @@ class Runtime extends EventEmitter {
                     height / 2
                 );
             }
+
+            this.emit(Runtime.STAGE_SIZE_CHANGED, width, height);
         }
-        this.emit(Runtime.STAGE_SIZE_CHANGED, width, height);
     }
 
     /**
