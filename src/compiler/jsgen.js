@@ -453,6 +453,7 @@ class JSGenerator {
                     source += `}\n`; // close case
                 }
                 source += '}\n'; // close switch
+                source += `if (${branchVariable}.onEnd[0]) yield ${branchVariable}.onEnd.shift()(${branchVariable});\n`;
                 source += `return ${returnVariable};\n`;
                 source += '})())'; // close function and yield
                 return new TypedInput(source, TYPE_UNKNOWN);
@@ -846,6 +847,7 @@ class JSGenerator {
                     this.source += `}\n`; // close case
                 }
                 this.source += '}\n'; // close switch
+                this.source += `if (${branchVariable}.onEnd[0]) yield ${branchVariable}.onEnd.shift()(${branchVariable});\n`;
                 this.source += `if (!${branchVariable}.isLoop) break;\n`;
                 this.yieldLoop();
                 this.source += '}\n'; // close while

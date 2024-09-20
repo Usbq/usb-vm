@@ -10,7 +10,8 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
         return this.thread.compatibilityStackFrame;
     }
 
-    startBranch (branchNumber, isLoop) {
+    startBranch (branchNumber, isLoop, onEnd) {
+        if (this._branchInfo && onEnd) this._branchInfo.onEnd.push(onEnd);
         this._startedBranch = [branchNumber, isLoop];
     }
 
@@ -29,10 +30,11 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
         throw new Error('getParam is not supported by this BlockUtility');
     }
 
-    init (thread, fakeBlockId, stackFrame) {
+    init (thread, fakeBlockId, stackFrame, branchInfo) {
         this.thread = thread;
         this.sequencer = thread.target.runtime.sequencer;
         this._startedBranch = null;
+        this._branchInfo = branchInfo;
         thread.stack[0] = fakeBlockId;
         thread.compatibilityStackFrame = stackFrame;
     }
