@@ -29,7 +29,7 @@ const BlockShape = {
     /**
      * Output shape: object (objects)
      */
-    OBJECT: ScratchBlockConstants.OUTPUT_SHAPE_OBJECT,
+    OBJECT: ScratchBlocksConstants.OUTPUT_SHAPE_OBJECT
 };
 
 module.exports = BlockShape;

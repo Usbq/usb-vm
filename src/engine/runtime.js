@@ -1522,15 +1522,15 @@ class Runtime extends EventEmitter {
         }
 
         if (blockInfo.blockShape ?? blockInfo.outputShape) {
-          blockJSON.outputShape = blockInfo.blockShape ?? blockInfo.outputShape;
+            blockJSON.outputShape = blockInfo.blockShape ?? blockInfo.outputShape;
         }
 
         if (Object.prototype.hasOwnProperty.call(blockInfo, 'output')) {
-          blockJSON.output = blockInfo.output;
+            blockJSON.output = blockInfo.output;
         }
 
         if (blockInfo.mutator) {
-          blockJSON.mutator = blockInfo.mutator;
+            blockJSON.mutator = blockInfo.mutator;
         }
 
 
