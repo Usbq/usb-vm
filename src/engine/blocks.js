@@ -477,6 +477,12 @@ class Blocks {
             if (e.isLocal && editingTarget && !editingTarget.isStage && !e.isCloud) {
                 if (!editingTarget.lookupVariableById(e.varId)) {
                     editingTarget.createVariable(e.varId, e.varName, e.varType);
+
+                    this.runtime.addPendingMonitor(e.varId);
+
+                    // TODO this should probably be batched
+                    // (esp. if we receive multiple new var_creates in a row).
+                    this.runtime.requestToolboxExtensionsUpdate();
                     this.emitProjectChanged();
                 }
             } else {
@@ -492,6 +498,12 @@ class Blocks {
                     }
                 }
                 stage.createVariable(e.varId, e.varName, e.varType, e.isCloud);
+                
+                this.runtime.addPendingMonitor(e.varId);
+
+                // TODO same as above, this should probably be batched
+                // (esp. if we receive multiple new var_creates in a row).
+                this.runtime.requestToolboxExtensionsUpdate();
                 this.emitProjectChanged();
             }
             break;
@@ -655,6 +667,20 @@ class Blocks {
             this._addScript(block.id);
         }
 
+        // A block was just created, see if it had an associated pending monitor,
+        // if so, keep track of the monitor state change by mimicing the checkbox
+        // event from the flyout. Clear record of this block from
+        // the pending monitors list.
+        if (this === this.runtime.monitorBlocks &&
+            this.runtime.getPendingMonitor(block.id)) {
+            this.changeBlock({
+                id: block.id, // Monitor blocks for variables are the variable ID.
+                element: 'checkbox', // Mimic checkbox event from flyout.
+                value: true
+            }, this.runtime);
+            this.runtime.removePendingMonitor(block.id);
+        }
+
         this.resetCache();
 
         // A new block was actually added to the block container,
@@ -685,14 +711,7 @@ class Blocks {
 
             // Update block value
             if (!block.fields[args.name]) return;
-            if (typeof block.fields[args.name].variableType !== 'undefined') {
-                // Get variable name using the id in args.value.
-                const variable = this.runtime.getEditingTarget().lookupVariableById(args.value);
-                if (variable) {
-                    block.fields[args.name].value = variable.name;
-                    block.fields[args.name].id = args.value;
-                }
-            } else {
+            if (typeof block.fields[args.name].variableType === 'undefined') {
                 // Changing the value in a dropdown
                 block.fields[args.name].value = args.value;
 
@@ -714,6 +733,13 @@ class Blocks {
                         id: flyoutBlock.id,
                         params: this._getBlockParams(flyoutBlock)
                     }));
+                }
+            } else {
+                // Get variable name using the id in args.value.
+                const variable = this.runtime.getEditingTarget().lookupVariableById(args.value);
+                if (variable) {
+                    block.fields[args.name].value = variable.name;
+                    block.fields[args.name].id = args.value;
                 }
             }
             break;
@@ -935,6 +961,41 @@ class Blocks {
 
         this.resetCache();
         this.emitProjectChanged();
+    }
+
+    getAllReferencesForVariable (variable) {
+        let fieldName;
+        let truncatedOpcode;
+        if (variable.type === Variable.SCALAR_TYPE) {
+            fieldName = 'VARIABLE';
+            truncatedOpcode = 'variable';
+        } else if (variable.type === Variable.LIST_TYPE) {
+            fieldName = 'LIST';
+            truncatedOpcode = 'listcontents';
+        } else {
+            // TODO handle broadcast messages later
+            return [];
+        }
+
+        const variableBlocks = [];
+        for (const blockId in this._blocks) {
+            if (!Object.prototype.hasOwnProperty.call(this._blocks, blockId)) continue;
+            const block = this._blocks[blockId];
+            // Check for blocks with fields referencing variable/list, otherwise variable/list reporters
+            if (block.fields[fieldName] &&
+                block.fields[fieldName].value === variable.name) {
+                // It's a block containing a variable field whose currently selected value
+                // matches the given variable name
+                variableBlocks.push(block);
+            } else if (block.mutation &&
+                block.mutation.blockInfo &&
+                block.mutation.blockInfo.opcode === truncatedOpcode &&
+                block.mutation.blockInfo.text === variable.name) {
+                // It's a variable reporter whose name matches the given variable
+                variableBlocks.push(block);
+            }
+        }
+        return variableBlocks;
     }
 
     /**
@@ -1222,25 +1283,33 @@ class Blocks {
                 xmlString += '</value>';
             }
         }
-        // Add any fields on this block.
-        for (const field in block.fields) {
-            if (!Object.prototype.hasOwnProperty.call(block.fields, field)) continue;
-            const blockField = block.fields[field];
-            xmlString += `<field name="${xmlEscape(blockField.name)}"`;
-            const fieldId = blockField.id;
-            if (fieldId) {
-                xmlString += ` id="${xmlEscape(fieldId)}"`;
+
+        // Add fields to the block, but only if the block itself
+        // doesn't have a mutation with a blockinfo.
+        // This is a dynamic extension block which will be laid out using
+        // its blockInfo mutation
+        if (!(block.mutation && block.mutation.blockInfo)) {
+            // Add any fields on this block.
+            for (const field in block.fields) {
+                if (!Object.prototype.hasOwnProperty.call(block.fields, field)) continue;
+                const blockField = block.fields[field];
+                xmlString += `<field name="${xmlEscape(blockField.name)}"`;
+                const fieldId = blockField.id;
+                if (fieldId) {
+                    xmlString += ` id="${xmlEscape(fieldId)}"`;
+                }
+                const varType = blockField.variableType;
+                if (typeof varType === 'string') {
+                    xmlString += ` variabletype="${xmlEscape(varType)}"`;
+                }
+                let value = blockField.value;
+                if (typeof value === 'string') {
+                    value = xmlEscape(blockField.value);
+                }
+                xmlString += `>${value}</field>`;
             }
-            const varType = blockField.variableType;
-            if (typeof varType === 'string') {
-                xmlString += ` variabletype="${xmlEscape(varType)}"`;
-            }
-            let value = blockField.value;
-            if (typeof value === 'string') {
-                value = xmlEscape(blockField.value);
-            }
-            xmlString += `>${value}</field>`;
         }
+
         // Add blocks connected to the next connection.
         if (block.next) {
             xmlString += `<next>${this.blockToXML(block.next, comments)}</next>`;

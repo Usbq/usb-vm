@@ -13,7 +13,7 @@ const MathUtil = require('../util/math-util');
  * Camera: instance of a camera object on the stage.
  */
 class Camera extends EventEmitter {
-    constructor(runtime) {
+    constructor (runtime) {
         super();
 
         this.runtime = runtime;

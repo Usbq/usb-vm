@@ -119,8 +119,9 @@ const waitPromise = function*(promise) {
             returnValue = value;
             thread.status = 0; // STATUS_RUNNING
         }, error => {
-            thread.status = 0; // STATUS_RUNNING
             globalState.log.warn('Promise rejected in compiled script:', error);
+            returnValue = '' + error;
+            thread.status = 0; // STATUS_RUNNING
         });
 
     yield;
@@ -151,7 +152,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
     };
 
     const executeBlock = () => {
-        blockUtility.init(thread, blockId, stackFrame);
+        blockUtility.init(thread, blockId, stackFrame, branchInfo);
         return blockFunction(inputs, blockUtility);
     };
 
@@ -162,7 +163,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         return returnValue;
     }
 
-    if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+    if (thread.status === 1 /* STATUS_PROMISE_WAIT */ || thread.status === 4 /* STATUS_DONE */) {
         // Something external is forcing us to stop
         yield;
         // Make up a return value because whatever is forcing us to stop can't specify one
@@ -189,13 +190,11 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
             return returnValue;
         }
 
-        if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+        if (thread.status === 1 /* STATUS_PROMISE_WAIT */ || thread.status === 4 /* STATUS_DONE */) {
             yield;
             return finish('');
         }
     }
-
-    // todo: do we have to do anything extra if status is STATUS_DONE?
 
     return finish(returnValue);
 }`;
@@ -208,7 +207,8 @@ runtimeFunctions.createBranchInfo = `const createBranchInfo = (isLoop) => ({
     defaultIsLoop: isLoop,
     isLoop: false,
     branch: 0,
-    stackFrame: {}
+    stackFrame: {},
+    onEnd: []
 });`;
 
 /**

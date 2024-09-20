@@ -5,7 +5,7 @@ if (typeof TextEncoder === 'undefined') {
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');
@@ -20,6 +20,9 @@ const formatMessage = require('format-message');
 
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
+
+const BLE = require('./io/ble');
+const BT = require('./io/bt');
 
 const {loadCostume} = require('./import/load-costume.js');
 const {loadSound} = require('./import/load-sound.js');
@@ -70,6 +73,11 @@ class VirtualMachine extends EventEmitter {
         centralDispatch.setService('runtime', createRuntimeService(this.runtime)).catch(e => {
             log.error(`Failed to register runtime service: ${JSON.stringify(e)}`);
         });
+
+        this.io = {
+            BLE,
+            BT
+        };
 
         /**
          * The "currently editing"/selected target ID for the VM.
@@ -135,6 +143,9 @@ class VirtualMachine extends EventEmitter {
         });
         this.runtime.on(Runtime.BLOCKS_NEED_UPDATE, () => {
             this.emitWorkspaceUpdate();
+        });
+        this.runtime.on(Runtime.BLOCK_UPDATE, (blockId, blockInfo) => {
+            this.emit(Runtime.BLOCK_UPDATE, blockId, blockInfo);
         });
         this.runtime.on(Runtime.TOOLBOX_EXTENSIONS_NEED_UPDATE, () => {
             this.extensionManager.refreshBlocks();
@@ -228,7 +239,8 @@ class VirtualMachine extends EventEmitter {
                     JSGenerator: require('./compiler/jsgen.js'),
                     IRGenerator: require('./compiler/irgen.js').IRGenerator,
                     ScriptTreeGenerator: require('./compiler/irgen.js').ScriptTreeGenerator,
-                    Thread: require('./engine/thread.js')
+                    Thread: require('./engine/thread.js'),
+                    execute: require('./engine/execute.js')
                 });
             }
         };
@@ -528,6 +540,15 @@ class VirtualMachine extends EventEmitter {
         // Put everything in a zip file
         zip.file('project.json', projectJson);
         this._addFileDescsToZip(this.serializeAssets(), zip);
+
+        // Use a fixed modification date for the files in the zip instead of letting JSZip use the
+        // current time to avoid a very small metadata leak and make zipping deterministic. The magic
+        // number is from the first TurboWarp/scratch-vm commit after forking
+        // (4a93dab4fa3704ab7a1374b9794026b3330f3433).
+        const date = new Date(1591657163000);
+        for (const file of Object.values(zip.files)) {
+            file.date = date;
+        }
 
         return zip;
     }

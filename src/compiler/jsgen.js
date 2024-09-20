@@ -433,14 +433,31 @@ class JSGenerator {
         case 'addons.call':
             return new TypedInput(`(${this.descendAddonCall(node)})`, TYPE_UNKNOWN);
 
-        case 'args.boolean':
-            return new TypedInput(`toBoolean(p${node.index})`, TYPE_BOOLEAN);
-        case 'args.stringNumber':
-            return new TypedInput(`p${node.index}`, TYPE_UNKNOWN);
         case 'args.parameter':
             return new TypedInput(`(thread.getParam("${node.name}") ?? 0)`, TYPE_UNKNOWN);
 
         case 'compat':
+            if (node.blockType === BlockType.INLINE) {
+                const branchVariable = this.localVariables.next();
+                const returnVariable = this.localVariables.next();
+                let source = '(yield* (function*() {\n';
+                source += `let ${returnVariable} = undefined;\n`;
+                source += `const ${branchVariable} = createBranchInfo(false);\n`;
+                source += `${returnVariable} = (${this.generateCompatibilityLayerCall(node, false, branchVariable)});\n`;
+                source += `${branchVariable}.branch = globalState.blockUtility._startedBranch[0];\n`;
+                source += `switch (${branchVariable}.branch) {\n`;
+                for (const index in node.substacks) {
+                    source += `case ${+index}: {\n`;
+                    source += this.descendStackForSource(node.substacks[index], new Frame(false));
+                    source += `break;\n`;
+                    source += `}\n`; // close case
+                }
+                source += '}\n'; // close switch
+                source += `if (${branchVariable}.onEnd[0]) yield ${branchVariable}.onEnd.shift()(${branchVariable});\n`;
+                source += `return ${returnVariable};\n`;
+                source += '})())'; // close function and yield
+                return new TypedInput(source, TYPE_UNKNOWN);
+            }
             // Compatibility layer inputs never use flags.
             return new TypedInput(`(${this.generateCompatibilityLayerCall(node, false)})`, TYPE_UNKNOWN);
 
@@ -691,6 +708,8 @@ class JSGenerator {
             }
             return new TypedInput(`${procedureReference}(${joinedArgs})`, TYPE_UNKNOWN);
         }
+        case 'procedures.argument':
+            return new TypedInput(`p${node.index}`, TYPE_UNKNOWN);
 
         case 'sensing.answer':
             return new TypedInput(`runtime.ext_scratch3_sensing._answer`, TYPE_STRING);
@@ -827,6 +846,7 @@ class JSGenerator {
                     this.source += `}\n`; // close case
                 }
                 this.source += '}\n'; // close switch
+                this.source += `if (${branchVariable}.onEnd[0]) yield ${branchVariable}.onEnd.shift()(${branchVariable});\n`;
                 this.source += `if (!${branchVariable}.isLoop) break;\n`;
                 this.yieldLoop();
                 this.source += '}\n'; // close while
@@ -924,6 +944,7 @@ class JSGenerator {
             break;
 
         case 'control.allAtOnce':
+            // eslint-disable-next-line no-case-declarations
             const previousWarp = this.isWarp;
             this.isWarp = true;
             this.descendStack(node.code, new Frame(false, 'control.allAtOnce'));
@@ -972,9 +993,12 @@ class JSGenerator {
             this.yielded();
             break;
 
+        // TODO: Lists that are locked don't need their monitors updated.
+        // In fact, they don't need to be executed at all, since right
+        // now, locked is a static value that cannot be changed.
         case 'list.add': {
             const list = this.referenceVariable(node.list);
-            this.source += `${list}.value.push(${this.descendInput(node.item).asSafe()});\n`;
+            this.source += `if (!${list}.locked) ${list}.value.push(${this.descendInput(node.item).asSafe()});\n`;
             this.source += `${list}._monitorUpToDate = false;\n`;
             break;
         }
@@ -983,12 +1007,12 @@ class JSGenerator {
             const index = this.descendInput(node.index);
             if (index instanceof ConstantInput) {
                 if (index.constantValue === 'last') {
-                    this.source += `${list}.value.pop();\n`;
+                    this.source += `if (!${list}.locked) ${list}.value.pop();\n`;
                     this.source += `${list}._monitorUpToDate = false;\n`;
                     break;
                 }
                 if (+index.constantValue === 1) {
-                    this.source += `${list}.value.shift();\n`;
+                    this.source += `if (!${list}.locked) ${list}.value.shift();\n`;
                     this.source += `${list}._monitorUpToDate = false;\n`;
                     break;
                 }
@@ -997,9 +1021,11 @@ class JSGenerator {
             this.source += `listDelete(${list}, ${index.asUnknown()});\n`;
             break;
         }
-        case 'list.deleteAll':
-            this.source += `${this.referenceVariable(node.list)}.value = [];\n`;
+        case 'list.deleteAll': {
+            const list = this.referenceVariable(node.list);
+            this.source += `if (!${list}.locked) ${list}.value = [];\n`;
             break;
+        }
         case 'list.hide':
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.list.id)}", element: "checkbox", value: false }, runtime);\n`;
             break;
@@ -1008,16 +1034,18 @@ class JSGenerator {
             const index = this.descendInput(node.index);
             const item = this.descendInput(node.item);
             if (index instanceof ConstantInput && +index.constantValue === 1) {
-                this.source += `${list}.value.unshift(${item.asSafe()});\n`;
+                this.source += `if (!${list}.locked) ${list}.value.unshift(${item.asSafe()});\n`;
                 this.source += `${list}._monitorUpToDate = false;\n`;
                 break;
             }
-            this.source += `listInsert(${list}, ${index.asUnknown()}, ${item.asSafe()});\n`;
+            this.source += `if (!${list}.locked) listInsert(${list}, ${index.asUnknown()}, ${item.asSafe()});\n`;
             break;
         }
-        case 'list.replace':
-            this.source += `listReplace(${this.referenceVariable(node.list)}, ${this.descendInput(node.index).asUnknown()}, ${this.descendInput(node.item).asSafe()});\n`;
+        case 'list.replace': {
+            const list = this.referenceVariable(node.list);
+            this.source += `if (!${list}.locked) listReplace(${list}, ${this.descendInput(node.index).asUnknown()}, ${this.descendInput(node.item).asSafe()});\n`;
             break;
+        }
         case 'list.show':
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.list.id)}", element: "checkbox", value: true }, runtime);\n`;
             break;
@@ -1263,6 +1291,16 @@ class JSGenerator {
         this.popFrame();
     }
 
+    descendStackForSource (nodes, frame) {
+        // Wrapper for descendStack to get the source
+        const oldSource = this.source;
+        this.source = '';
+        this.descendStack(nodes, frame);
+        const stackSource = this.source;
+        this.source = oldSource;
+        return stackSource;
+    }
+
     descendVariable (variable) {
         if (Object.prototype.hasOwnProperty.call(this.variableInputs, variable.id)) {
             return this.variableInputs[variable.id];
@@ -1484,6 +1522,26 @@ class JSGenerator {
         return fn;
     }
 }
+
+// For extensions.
+JSGenerator.unstable_exports = {
+    TYPE_NUMBER,
+    TYPE_STRING,
+    TYPE_BOOLEAN,
+    TYPE_UNKNOWN,
+    TYPE_NUMBER_NAN,
+    factoryNameVariablePool,
+    functionNameVariablePool,
+    generatorNameVariablePool,
+    VariablePool,
+    PEN_EXT,
+    PEN_STATE,
+    TypedInput,
+    ConstantInput,
+    VariableInput,
+    Frame,
+    sanitize
+};
 
 // Test hook used by automated snapshot testing.
 JSGenerator.testingApparatus = null;

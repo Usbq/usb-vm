@@ -43,8 +43,7 @@ class Scratch3StringBlocks {
     reverse (args) { // usb
         const str = Cast.toString(args.STRING);
 
-        return str.split('')
-            .reverse()
+        return str.split('').reverse()
             .join('');
     }
 
