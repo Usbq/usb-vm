@@ -626,8 +626,8 @@ class JSGenerator {
             const right = this.descendInput(node.right);
             return new TypedInput(`(${left.asUnknown()} <= ${right.asUnknown()})`, TYPE_BOOLEAN);
         }
-        //case 'op.letterOf':
-        //    return new TypedInput(`((${this.descendInput(node.string).asString()})[(${this.descendInput(node.letter).asNumber()} | 0) - 1] || "")`, TYPE_STRING);
+        // case 'op.letterOf':
+        //     return new TypedInput(`((${this.descendInput(node.string).asString()})[(${this.descendInput(node.letter).asNumber()} | 0) - 1] || "")`, TYPE_STRING);
         case 'op.lettersOf':
             return new TypedInput(`((${this.descendInput(node.string).asString()}).substring(${this.descendInput(node.left).asNumber() - 1}, ${this.descendInput(node.right).asNumber()}) || "")`, TYPE_STRING);
         case 'op.ln':
