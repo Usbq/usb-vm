@@ -1525,6 +1525,15 @@ class Runtime extends EventEmitter {
           blockJSON.outputShape = blockInfo.blockShape ?? blockInfo.outputShape;
         }
 
+        if (Object.prototype.hasOwnProperty.call(blockInfo, 'output')) {
+          blockJSON.output = blockInfo.output;
+        }
+
+        if (blockInfo.mutator) {
+          blockJSON.mutator = blockInfo.mutator;
+        }
+
+
         const blockText = Array.isArray(blockInfo.text) ? blockInfo.text : [blockInfo.text];
         let inTextNum = 0; // text for the next block "arm" is blockText[inTextNum]
         let inBranchNum = 0; // how many branches have we placed into the JSON so far?
