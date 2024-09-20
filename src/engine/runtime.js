@@ -1533,6 +1533,13 @@ class Runtime extends EventEmitter {
             blockJSON.mutator = blockInfo.mutator;
         }
 
+        if (Object.prototype.hasOwnProperty.call(blockInfo, 'tooltip')) {
+            blockJSON.tooltip = blockInfo.tooltip;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(blockInfo, 'warning')) {
+            blockJSON.warning = blockInfo.warning;
+        }
 
         const blockText = Array.isArray(blockInfo.text) ? blockInfo.text : [blockInfo.text];
         let inTextNum = 0; // text for the next block "arm" is blockText[inTextNum]
