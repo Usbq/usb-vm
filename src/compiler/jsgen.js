@@ -437,6 +437,26 @@ class JSGenerator {
             return new TypedInput(`(thread.getParam("${node.name}") ?? 0)`, TYPE_UNKNOWN);
 
         case 'compat':
+            if (node.blockType === BlockType.INLINE) {
+                const branchVariable = this.localVariables.next();
+                const returnVariable = this.localVariables.next();
+                let source = '(yield* (function*() {\n';
+                source += `let ${returnVariable} = undefined;\n`;
+                source += `const ${branchVariable} = createBranchInfo(false);\n`;
+                source += `${returnVariable} = (${this.generateCompatibilityLayerCall(node, false, branchVariable)});\n`;
+                source += `${branchVariable}.branch = globalState.blockUtility._startedBranch[0];\n`;
+                source += `switch (${branchVariable}.branch) {\n`;
+                for (const index in node.substacks) {
+                    source += `case ${+index}: {\n`;
+                    source += this.descendStackForSource(node.substacks[index], new Frame(false));
+                    source += `break;\n`;
+                    source += `}\n`; // close case
+                }
+                source += '}\n'; // close switch
+                source += `return ${returnVariable};\n`;
+                source += '})())'; // close function and yield
+                return new TypedInput(source, TYPE_UNKNOWN);
+            }
             // Compatibility layer inputs never use flags.
             return new TypedInput(`(${this.generateCompatibilityLayerCall(node, false)})`, TYPE_UNKNOWN);
 
@@ -1268,6 +1288,16 @@ class JSGenerator {
         // TODO: in if/else this might create an extra unused object
         this.resetVariableInputs();
         this.popFrame();
+    }
+
+    descendStackForSource (nodes, frame) {
+        // Wrapper for descendStack to get the source
+        const oldSource = this.source;
+        this.source = '';
+        this.descendStack(nodes, frame);
+        const stackSource = this.source;
+        this.source = oldSource;
+        return stackSource;
     }
 
     descendVariable (variable) {
