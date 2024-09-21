@@ -86,7 +86,6 @@ class TypedInput {
     }
 
     asString () {
-        console.log(this.source, `(${Cast.toString(this.source)})`, "a");
         if (this.type === TYPE_STRING) return this.source;
         return `(${Cast.toString(this.source)})`;
     }
@@ -150,7 +149,6 @@ class ConstantInput {
     }
 
     asString () {
-        console.log(this.source, Cast.toString(this.source), "b");
         return Cast.toString(this.source);
     }
 
@@ -264,7 +262,6 @@ class VariableInput {
     }
 
     asString () {
-        console.log(this.source, `(${Cast.toString(this.source)})`, "c");
         if (this.type === TYPE_STRING) return this.source;
         return `(${Cast.toString(this.source)})`;
     }
@@ -1254,7 +1251,6 @@ class JSGenerator {
             const value = this.localVariables.next();
             this.source += `const ${value} = ${this.descendInput(node.input).asUnknown()};`;
             // blocks like legacy no-ops can return a literal `undefined`
-            this.source += `console.log(${value})`;
             this.source += `if (${value} !== undefined) runtime.visualReport("${sanitize(this.script.topBlockId)}", ${value});\n`;
             break;
         }
