@@ -174,6 +174,11 @@ class ConstantInput {
             // todo: handle NaN?
             return this.constantValue;
         }
+        // We mustn't convert raw objects to strings. Blocks can handle that.
+        if (typeof this.constantValue === 'object') {
+            // todo: handle NaN?
+            return this.constantValue;
+        }
         const numberValue = +this.constantValue;
         if (numberValue.toString() === this.constantValue) {
             return this.constantValue;
