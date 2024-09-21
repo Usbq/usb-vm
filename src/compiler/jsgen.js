@@ -19,6 +19,9 @@ const {IntermediateScript, IntermediateRepresentation} = require('./intermediate
 const sanitize = string => {
     if (typeof string !== 'string') {
         log.warn(`sanitize got unexpected type: ${typeof string}`);
+        if (typeof string === 'object') {
+            return JSON.stringify(string);
+        }
         string = '' + string;
     }
     return JSON.stringify(string).slice(1, -1);
