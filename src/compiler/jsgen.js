@@ -19,6 +19,9 @@ const {IntermediateScript, IntermediateRepresentation} = require('./intermediate
 const sanitize = string => {
     if (typeof string !== 'string') {
         log.warn(`sanitize got unexpected type: ${typeof string}`);
+        if (typeof string === 'object') {
+            return JSON.stringify(string);
+        }
         string = '' + string;
     }
     return JSON.stringify(string).slice(1, -1);
@@ -149,7 +152,7 @@ class ConstantInput {
     }
 
     asString () {
-        return `"${sanitize('' + this.constantValue)}"`;
+        return Cast.toString(this.source);
     }
 
     asBoolean () {
@@ -169,6 +172,11 @@ class ConstantInput {
     asUnknown () {
         // Attempt to convert strings to numbers if it is unlikely to break things
         if (typeof this.constantValue === 'number') {
+            // todo: handle NaN?
+            return this.constantValue;
+        }
+        // We mustn't convert raw objects to strings. Blocks can handle that.
+        if (typeof this.constantValue === 'object') {
             // todo: handle NaN?
             return this.constantValue;
         }
