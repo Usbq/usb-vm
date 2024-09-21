@@ -154,7 +154,7 @@ class Cast {
             console.log(value, "sanitize, is object");
             return JSON.stringify(value);
         } 
-        console.log(value, "sanitize, is object");
+        console.log(value, "sanitize, isnt object");
         return value;
     }
 
