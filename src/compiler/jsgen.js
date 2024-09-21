@@ -87,6 +87,7 @@ class TypedInput {
 
     asString () {
         if (this.type === TYPE_STRING) return this.source;
+        console.log(this.source, `(${Cast.toString(this.source)})`);
         return `(${Cast.toString(this.source)})`;
     }
 
