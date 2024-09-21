@@ -90,7 +90,7 @@ class TypedInput {
 
     asString () {
         if (this.type === TYPE_STRING) return this.source;
-        return `(${Cast.toString(this.source)})`;
+        return `toString(${this.source})`;
     }
 
     asBoolean () {
@@ -266,7 +266,7 @@ class VariableInput {
 
     asString () {
         if (this.type === TYPE_STRING) return this.source;
-        return `(${Cast.toString(this.source)})`;
+        return `toString(${this.source})`;
     }
 
     asBoolean () {
