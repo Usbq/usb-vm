@@ -55,6 +55,7 @@ const defaultBlockPackages = {
 const interpolate = require('./tw-interpolate');
 const FrameLoop = require('./tw-frame-loop');
 const Camera = require('./camera');
+const Cast = require('../util/cast.js');
 
 const defaultExtensionColors = ['#0FBD8C', '#0DA57A', '#0B8E69'];
 
@@ -1169,7 +1170,7 @@ class Runtime extends EventEmitter {
 
                 // Emit events for custom shape types from extension
                 this.emit(Runtime.EXTENSION_SHAPE_ADDED, {
-                    implementation: blockShapeInfo,
+                    implementation: blockShapeInfo
                 });
             }
         }
@@ -3312,9 +3313,12 @@ class Runtime extends EventEmitter {
      * @param {string} value Value to show associated with the block.
      */
     visualReport (blockId, value) {
-        this.emit(Runtime.VISUAL_REPORT, {id: blockId, value: ((
-            typeof value === 'object'
-        ) ? value : String(value)), type: typeof value});
+        this.emit(Runtime.VISUAL_REPORT, {
+            id: blockId,
+            value: (
+                (typeof value === 'object') ? value : Cast.toString(value)),
+            type: typeof value
+        });
     }
 
     /**
