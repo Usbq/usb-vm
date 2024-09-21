@@ -87,7 +87,7 @@ class TypedInput {
 
     asString () {
         if (this.type === TYPE_STRING) return this.source;
-        return `("" + ${sanitize(this.source)})`;
+        return `(${Cast.toString(this.source)})`;
     }
 
     asBoolean () {
@@ -149,7 +149,7 @@ class ConstantInput {
     }
 
     asString () {
-        return `"${sanitize('' + this.constantValue)}"`;
+        return Cast.toString(this.source);
     }
 
     asBoolean () {
@@ -258,7 +258,7 @@ class VariableInput {
 
     asString () {
         if (this.type === TYPE_STRING) return this.source;
-        return `("" + ${this.source})`;
+        return `(${Cast.toString(this.source)})`;
     }
 
     asBoolean () {
