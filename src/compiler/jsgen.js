@@ -86,7 +86,7 @@ class TypedInput {
     }
 
     asString () {
-        console.log(this.source, `(${Cast.toString(this.source)})`, a);
+        console.log(this.source, `(${Cast.toString(this.source)})`, "a");
         if (this.type === TYPE_STRING) return this.source;
         return `(${Cast.toString(this.source)})`;
     }
@@ -150,7 +150,7 @@ class ConstantInput {
     }
 
     asString () {
-        console.log(this.source, Cast.toString(this.source), b);
+        console.log(this.source, Cast.toString(this.source), "b");
         return Cast.toString(this.source);
     }
 
@@ -259,7 +259,7 @@ class VariableInput {
     }
 
     asString () {
-        console.log(this.source, `(${Cast.toString(this.source)})`, c);
+        console.log(this.source, `(${Cast.toString(this.source)})`, "c");
         if (this.type === TYPE_STRING) return this.source;
         return `(${Cast.toString(this.source)})`;
     }
