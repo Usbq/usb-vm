@@ -92,7 +92,6 @@ class Cast {
      * @return {string} The Scratch-casted string value.
      */
     static toString (value) {
-        console.log(value, "toString");
         return String(this.sanitize(value));
     }
 
@@ -151,10 +150,8 @@ class Cast {
      */
     static sanitize (value) {
         if (typeof value === 'object') {
-            console.log(value, "sanitize, is object");
             return JSON.stringify(value);
-        } 
-        console.log(value, "sanitize, isnt object");
+        }
         return value;
     }
 
