@@ -66,6 +66,8 @@ const generatorNameVariablePool = new VariablePool('gen');
  * @property {() => boolean} isNeverNumber
  */
 
+const CAST_LOGGING = false;
+
 /**
  * @implements {Input}
  */
@@ -78,35 +80,42 @@ class TypedInput {
     }
 
     asNumber () {
+        if (CAST_LOGGING) console.log('TypedInput@asNumber', this);
         if (this.type === TYPE_NUMBER) return this.source;
         if (this.type === TYPE_NUMBER_NAN) return `(${this.source} || 0)`;
         return `(+${this.source} || 0)`;
     }
 
     asNumberOrNaN () {
+        if (CAST_LOGGING) console.log('TypedInput@asNumberOrNaN', this);
         if (this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN) return this.source;
         return `(+${this.source})`;
     }
 
     asString () {
+        if (CAST_LOGGING) console.log('TypedInput@asString', this);
         if (this.type === TYPE_STRING) return this.source;
-        return `toString(${this.source})`;
+        return `asString(${this.source})`;
     }
 
     asBoolean () {
+        if (CAST_LOGGING) console.log('TypedInput@asBoolean', this);
         if (this.type === TYPE_BOOLEAN) return this.source;
-        return `toBoolean(${this.source})`;
+        return `asBoolean(${this.source})`;
     }
 
     asColor () {
+        if (CAST_LOGGING) console.log('TypedInput@asColor', this);
         return this.asUnknown();
     }
 
     asUnknown () {
+        if (CAST_LOGGING) console.log('TypedInput@asUnknown', this);
         return this.source;
     }
 
     asSafe () {
+        if (CAST_LOGGING) console.log('TypedInput@asSafe', this);
         return this.asUnknown();
     }
 
@@ -133,6 +142,7 @@ class ConstantInput {
     }
 
     asNumber () {
+        if (CAST_LOGGING) console.log('ConstantInput@asNumber', this);
         // Compute at compilation time
         const numberValue = +this.constantValue;
         if (numberValue) {
@@ -148,19 +158,23 @@ class ConstantInput {
     }
 
     asNumberOrNaN () {
+        if (CAST_LOGGING) console.log('ConstantInput@asNumberOrNaN', this);
         return this.asNumber();
     }
 
     asString () {
-        return Cast.toString(this.source);
+        if (CAST_LOGGING) console.log('ConstantInput@asString', this);
+        return "" + this.constantValue;
     }
 
     asBoolean () {
+        if (CAST_LOGGING) console.log('ConstantInput@asBoolean', this);
         // Compute at compilation time
         return Cast.toBoolean(this.constantValue).toString();
     }
 
     asColor () {
+        if (CAST_LOGGING) console.log('ConstantInput@asColor', this);
         // Attempt to parse hex code at compilation time
         if (/^#[0-9a-f]{6,8}$/i.test(this.constantValue)) {
             const hex = this.constantValue.substr(1);
@@ -170,6 +184,7 @@ class ConstantInput {
     }
 
     asUnknown () {
+        if (CAST_LOGGING) console.log('ConstantInput@asUnknown', this);
         // Attempt to convert strings to numbers if it is unlikely to break things
         if (typeof this.constantValue === 'number') {
             // todo: handle NaN?
@@ -188,6 +203,7 @@ class ConstantInput {
     }
 
     asSafe () {
+        if (CAST_LOGGING) console.log('ConstantInput@asSafe', this);
         if (this.safe) {
             return this.asUnknown();
         }
@@ -254,35 +270,42 @@ class VariableInput {
     }
 
     asNumber () {
+        if (CAST_LOGGING) console.log('VariableInput@asNumber', this);
         if (this.type === TYPE_NUMBER) return this.source;
         if (this.type === TYPE_NUMBER_NAN) return `(${this.source} || 0)`;
         return `(+${this.source} || 0)`;
     }
 
     asNumberOrNaN () {
+        if (CAST_LOGGING) console.log('VariableInput@asNumberOrNaN', this);
         if (this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN) return this.source;
         return `(+${this.source})`;
     }
 
     asString () {
+        if (CAST_LOGGING) console.log('VariableInput@asString', this);
         if (this.type === TYPE_STRING) return this.source;
-        return `toString(${this.source})`;
+        return `asString(${this.source})`;
     }
 
     asBoolean () {
+        if (CAST_LOGGING) console.log('VariableInput@asBoolean', this);
         if (this.type === TYPE_BOOLEAN) return this.source;
-        return `toBoolean(${this.source})`;
+        return `asBoolean(${this.source})`;
     }
 
     asColor () {
+        if (CAST_LOGGING) console.log('VariableInput@asColor', this);
         return this.asUnknown();
     }
 
     asUnknown () {
+        if (CAST_LOGGING) console.log('VariableInput@asUnknown', this);
         return this.source;
     }
 
     asSafe () {
+        if (CAST_LOGGING) console.log('VariableInput@asSafe', this);
         return this.asUnknown();
     }
 

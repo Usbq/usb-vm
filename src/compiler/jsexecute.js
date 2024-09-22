@@ -225,7 +225,7 @@ runtimeFunctions.retire = `const retire = () => {
  * @param {*} value The value to cast
  * @returns {boolean} The value cast to a boolean
  */
-runtimeFunctions.toBoolean = `const toBoolean = value => {
+runtimeFunctions.asBoolean = `const asBoolean = value => {
     if (typeof value === 'boolean') {
         return value;
     }
@@ -244,7 +244,7 @@ runtimeFunctions.toBoolean = `const toBoolean = value => {
  * @param {*} value The value to cast
  * @returns {string} THe value cast to a string
  */
-runtimeFunctions.toString = `const toString = value => {
+runtimeFunctions.asString = `const asString = value => {
     if (typeof value === 'object') {
         try {
             return JSON.stringify(value);
