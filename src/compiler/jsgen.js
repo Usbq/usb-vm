@@ -66,7 +66,7 @@ const generatorNameVariablePool = new VariablePool('gen');
  * @property {() => boolean} isNeverNumber
  */
 
-const CAST_LOGGING = false;
+let CAST_LOGGING = false;
 
 /**
  * @implements {Input}
@@ -164,7 +164,7 @@ class ConstantInput {
 
     asString () {
         if (CAST_LOGGING) console.log('ConstantInput@asString', this);
-        return "" + this.constantValue;
+        return `("${sanitize('' + this.constantValue)}")`;
     }
 
     asBoolean () {
@@ -1572,7 +1572,10 @@ JSGenerator.unstable_exports = {
     ConstantInput,
     VariableInput,
     Frame,
-    sanitize
+    sanitize,
+    set CAST_LOGGING (value) {
+        CAST_LOGGING = Boolean(value);
+    }
 };
 
 // Test hook used by automated snapshot testing.

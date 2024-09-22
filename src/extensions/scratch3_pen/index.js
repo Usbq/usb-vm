@@ -318,6 +318,35 @@ class Scratch3PenBlocks {
                     })
                 },
                 {
+                    opcode: 'setStageColour',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'pen.setStageColour',
+                        default: 'set stage color [COLOR]',
+                        description: 'sets the canvas colour (with transparency support)'
+                    }),
+                    arguments: {
+                        COLOR: {
+                            type: ArgumentType.COLOR
+                        }
+                    }
+                },
+                {
+                    opcode: 'setStageTransparency',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'pen.setStageTransparency',
+                        default: 'set stage transparency [TRANSPARENCY]',
+                        description: 'sets the canvas transparency'
+                    }),
+                    arguments: {
+                        TRANSPARENCY: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 100
+                        }
+                    }
+                },
+                {
                     opcode: 'stamp',
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
@@ -523,6 +552,26 @@ class Scratch3PenBlocks {
     }
 
     /**
+     * The pen "set stage colour" block sets the canvas colour.
+     */
+    setStageColour (args) {
+        const rgb = Cast.toRgbColorObject(args.COLOR);
+        if (!Object.prototype.hasOwnProperty(rgb, 'a')) {
+            rgb.a = 255;
+        }
+        this.runtime.renderer._backgroundColor4f[3] = rgb.a / 255;
+        this.runtime.renderer.setBackgroundColor(rgb.r / 255, rgb.g / 255, rgb.b / 255);
+    }
+
+    /**
+     * The pen "set stage transparency" block sets the canvas transparency
+     */
+    setStageTransparency (args) {
+        this.runtime.renderer._backgroundColor4f[3] = Math.max(Math.min(Cast.toNumber(args.TRANSPARENCY), 100), 0) / 100;
+        this.runtime.renderer.dirty = true;
+    }
+
+    /**
      * The pen "stamp" block stamps the current drawable's image onto the pen layer.
      * @param {object} args - the block arguments.
      * @param {object} util - utility object provided by the runtime.
@@ -541,7 +590,7 @@ class Scratch3PenBlocks {
     /**
      * The pen "pen down" block causes the target to leave pen trails on future motion.
      * @param {object} args - the block arguments.
-     * @param {object} util - utility object provided by the runtime.
+     * @param {object} util - utility object provided by the runtime.B
      */
     penDown (args, util) {
         this._penDown(util.target);
