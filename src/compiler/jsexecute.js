@@ -10,6 +10,7 @@
 const globalState = {
     Timer: require('../util/timer'),
     Cast: require('../util/cast'),
+    Clone: require('../util/clone'),
     log: require('../util/log'),
     blockUtility: require('./compat-block-utility'),
     thread: null
@@ -470,6 +471,16 @@ runtimeFunctions.listReplace = `const listReplace = (list, idx, value) => {
 }`;
 
 /**
+ * Set the contents in a list.
+ * @param {import('../engine/variable')} list The list
+ * @param {*} array The new contents.
+ */
+runtimeFunctions.listSet = `const listSet = (list, array) => {
+    list.value = globalState.Cast.toArray(array);
+    list._monitorUpToDate = false;
+}`;
+
+/**
  * Insert a value in a list.
  * @param {import('../engine/variable')} list The list.
  * @param {*} idx The Scratch index in the list.
@@ -559,7 +570,7 @@ runtimeFunctions.listContents = `const listContents = list => {
  * @returns {string} Stringified form of the list.
  */
 runtimeFunctions.listArrayContents = `const listArrayContents = list => {
-    return list.value;
+    return globalState.Clone.structured(list.value);
 }`;
 
 /**
