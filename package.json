@@ -25,7 +25,8 @@
     "tap:integration": "tap ./test/integration/*.js",
     "test": "npm run lint && npm run tap",
     "watch": "webpack --progress --colors --watch",
-    "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\""
+    "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\"",
+    "update": "node scripts/updatedeps.mjs"
   },
   "tap": {
     "branches": 60,
@@ -66,6 +67,7 @@
     "babel-loader": "8.2.2",
     "callsite": "1.0.0",
     "copy-webpack-plugin": "4.5.4",
+    "depended": "github:Unsandboxed/depended#main",
     "docdash": "1.2.0",
     "eslint": "8.55.0",
     "eslint-config-scratch": "9.0.3",
