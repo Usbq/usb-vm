@@ -825,6 +825,14 @@ class Runtime extends EventEmitter {
     }
 
     /**
+     * Event name for camera update report.
+     * @const {string}
+     */
+    static get CAMERA_UPDATE () {
+        return 'CAMERA_UPDATE';
+    }
+
+    /**
      * Event name for targets update report.
      * @const {string}
      */
