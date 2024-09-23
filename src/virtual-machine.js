@@ -232,6 +232,10 @@ class VirtualMachine extends EventEmitter {
             Sprite,
             RenderedTarget,
             JSZip,
+            Buffer,
+            Base64: Base64Util,
+            RESERVED_NAMES,
+            JSON5: require('json5'),
 
             i_will_not_ask_for_help_when_these_break: () => {
                 console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.');
