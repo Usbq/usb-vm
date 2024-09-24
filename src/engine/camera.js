@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 const Cast = require('../util/cast');
 const MathUtil = require('../util/math-util');
-const Runtime = require('./engine/runtime');
+const Runtime = require('./runtime');
 
 /**
  * @fileoverview
