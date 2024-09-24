@@ -121,7 +121,7 @@ class Camera extends EventEmitter {
             this.zoom
         );
 
-        this.runtime.emit(Runtime.CAMERA_UPDATE, this);
+        this.runtime.emit("CAMERA_UPDATE", this);
 
         this.runtime.requestRedraw();
     }
