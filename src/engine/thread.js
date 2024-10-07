@@ -344,6 +344,8 @@ class Thread {
         }
     }
 
+
+
     /**
      * Get top stack item.
      * @return {?string} Block ID on top of stack.
@@ -351,8 +353,103 @@ class Thread {
     peekStack () {
         return this.stack.length > 0 ? this.stack[this.stack.length - 1] : null;
     }
+    
+    // Code borrowed from https://github.com/surv-is-a-dev/gallery/edit/main/site-files/extensions/0znzw/tests/breakContinue.js
+    // Commenting done by the Unsandboxed team.
 
+    /**
+     * Get the stackframe of the current loop.
+     * @param {Thread} thread 
+     * @returns {boolean|Array<any, number>}
+     */
+    static getLoopFrame (thread) {
+      const stackFrames = thread.stackFrames, frameCount = stackFrames.length;
+      let loopFrameBlock = null, loopFrameIndex;
 
+      for (let i = frameCount - 1; i >= 0; i--) {
+        // This check should literally never pass, 
+        // but as GarboMuffin once said, "just in case".
+        if (i < 0) break;
+        if (!stackFrames[i].isLoop) continue;
+        loopFrameBlock = stackFrames[i].op.id;
+        loopFrameIndex = i;
+        break;
+      }
+
+      if (!loopFrameBlock) {
+        // We are not inside of a loop block.
+        return false;
+      }
+
+      return [loopFrameBlock, loopFrameIndex];
+    }
+
+    /**
+     * TODO: Make these work for extensions that are not intepreter only.
+     * (It will probably require some compiler changes for extension blocks).
+     */
+    /**
+     * Break the current executing loop.
+     */
+    breakCurrentLoop () {
+      const blocks = this.blockContainer, stackFrame = this.peekStackFrame();
+
+      if (!stackFrame._breakData) {
+        let frameData = false;
+        if (!(frameData = Thread.getLoopFrame(this))) return;
+        const loopFrameBlock = frameData[0];
+        const afterLoop = blocks.getBlock(loopFrameBlock).next;
+        stackFrame._breakData = { loopFrameBlock, afterLoop };
+      }
+
+      const { loopFrameBlock, afterLoop } = stackFrame._breakData;
+
+      // Remove any remaining blocks within the remaining stack
+      // until we reach the loop block. 
+      let _;
+      while ((_ = this.stack.at(-1)) !== loopFrameBlock) {
+        // We don't want to exit from a procedure
+        if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
+        this.popStack();
+      }
+
+      // Remove the remaining loop block.
+      this.popStack();
+
+      // If there's a block after the loop, continue
+      // from there.
+      if (afterLoop) {
+        this.pushStack(afterLoop);
+      }
+    }
+
+    /**
+     * Continue the current running loop onto the next iteration.
+     */
+    continueCurrentLoop () {
+      const blocks = this.blockContainer, stackFrame = this.peekStackFrame();
+
+      if (!stackFrame._continueData) {
+        let frameData = false;
+        if (!(frameData = Thread.getLoopFrame(this))) return;
+        stackFrame._continueData = frameData[0];
+      }
+
+      // Pop the stack until we are at the loop block
+      // (we make sure to check if the stack exists though to prevent errors)
+      let _;
+      while(this.stack[0] && (_ = this.stack.at(-1)) !== stackFrame._continueData) {
+        // Same as break.
+        if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
+        this.popStack();
+      }
+
+      // "run util.yield", and restart the loop block
+      this.status = Thread.STATUS_YIELD;
+    }
+
+    // end of borrowed code
+    
     /**
      * Get top stack frame.
      * @return {?object} Last stack frame stored on this thread.
@@ -528,5 +625,7 @@ class Thread {
 
 // for extensions
 Thread._StackFrame = _StackFrame;
+// (super duper secret export shhh!!!)
+Thread._compile = () => require('../compiler/compile');
 
 module.exports = Thread;
