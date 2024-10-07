@@ -94,6 +94,7 @@ Object.assign(global.Scratch, ScratchCommon, {
  */
 const extensionWorker = new ExtensionWorker();
 global.Scratch.extensions = {
+    isUnsandboxed: true,
     register: extensionWorker.register.bind(extensionWorker)
 };
 
