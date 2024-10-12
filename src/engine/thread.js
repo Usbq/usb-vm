@@ -353,13 +353,13 @@ class Thread {
     peekStack () {
         return this.stack.length > 0 ? this.stack[this.stack.length - 1] : null;
     }
-    
+
     // Code borrowed from https://github.com/surv-is-a-dev/gallery/edit/main/site-files/extensions/0znzw/tests/breakContinue.js
     // Commenting done by the Unsandboxed team.
 
     /**
      * Get the stackframe of the current loop.
-     * @param {Thread} thread 
+     * @param {Thread} thread
      * @returns {boolean|Array<any, number>}
      */
     static getLoopFrame (thread) {
@@ -367,10 +367,10 @@ class Thread {
       let loopFrameBlock = null, loopFrameIndex;
 
       for (let i = frameCount - 1; i >= 0; i--) {
-        // This check should literally never pass, 
+        // This check should literally never pass,
         // but as GarboMuffin once said, "just in case".
         if (i < 0) break;
-        if (!stackFrames[i].isLoop) continue;
+        if (!(stackFrames[i].isLoop && stackFrames[i].isBreakable)) continue;
         loopFrameBlock = stackFrames[i].op.id;
         loopFrameIndex = i;
         break;
@@ -405,7 +405,7 @@ class Thread {
       const { loopFrameBlock, afterLoop } = stackFrame._breakData;
 
       // Remove any remaining blocks within the remaining stack
-      // until we reach the loop block. 
+      // until we reach the loop block.
       let _;
       while ((_ = this.stack.at(-1)) !== loopFrameBlock) {
         // We don't want to exit from a procedure
@@ -449,7 +449,7 @@ class Thread {
     }
 
     // end of borrowed code
-    
+
     /**
      * Get top stack frame.
      * @return {?object} Last stack frame stored on this thread.
