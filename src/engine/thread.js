@@ -70,6 +70,12 @@ class _StackFrame {
          * @type {object}
          */
         this.op = null;
+
+        /**
+         * Whether or not this frame can be broken by the continue and break blocks
+         * @type {boolean}
+         */
+        this.isBreakable = false;
     }
 
     /**
@@ -87,6 +93,7 @@ class _StackFrame {
         this.params = null;
         this.executionContext = null;
         this.op = null;
+        this.isBreakable = false;
 
         return this;
     }
