@@ -370,7 +370,7 @@ class Thread {
         // This check should literally never pass,
         // but as GarboMuffin once said, "just in case".
         if (i < 0) break;
-        if (!(stackFrames[i].isLoop && stackFrames[i].isBreakable)) continue;
+        if (!(stackFrames[i].isLoop || stackFrames[i].isBreakable)) continue;
         loopFrameBlock = stackFrames[i].op.id;
         loopFrameIndex = i;
         break;
