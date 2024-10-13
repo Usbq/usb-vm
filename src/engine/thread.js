@@ -72,10 +72,17 @@ class _StackFrame {
         this.op = null;
 
         /**
-         * Whether or not this frame can be broken by the continue and break blocks
+         * Whether or not this frame can be broken by a break block
          * @type {boolean}
          */
         this.isBreakable = false;
+
+        /**
+         * Whether or not this frame can be broken by a continue block
+         * (Kind of redundant but for the sake of it, its being added)
+         * @type {boolean}
+         */
+        this.isIterable = false;
     }
 
     /**
@@ -94,6 +101,7 @@ class _StackFrame {
         this.executionContext = null;
         this.op = null;
         this.isBreakable = false;
+        this.isIterable = false;
 
         return this;
     }
@@ -369,7 +377,7 @@ class Thread {
      * @param {Thread} thread
      * @returns {boolean|Array<any, number>}
      */
-    static getLoopFrame (thread) {
+    static getLoopFrame (thread, iter) {
       const stackFrames = thread.stackFrames, frameCount = stackFrames.length;
       let loopFrameBlock = null, loopFrameIndex;
 
@@ -377,7 +385,7 @@ class Thread {
         // This check should literally never pass,
         // but as GarboMuffin once said, "just in case".
         if (i < 0) break;
-        if (!(stackFrames[i].isLoop || stackFrames[i].isBreakable)) continue;
+        if (!(stackFrames[i].isLoop || (iter ? stackFrames[i].isIterable : stackFrames[i].isBreakable))) continue;
         loopFrameBlock = stackFrames[i].op.id;
         loopFrameIndex = i;
         break;

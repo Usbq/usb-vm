@@ -370,6 +370,12 @@ class Frame {
         this.isLoop = isLoop;
 
         /**
+         * For compatibility with StackFrame
+         * @type {boolean}
+         */
+        this.isIterable = this.isLoop;
+
+        /**
          * Whether the current block is the last block in the stack.
          * @type {boolean}
          */
@@ -955,7 +961,7 @@ class JSGenerator {
             if (this.frames.find(frame =>  frame.isLoop || frame.isBreakable)) this.source += 'break;\n';
             break;
         case 'control.continue':
-            if (this.frames.find(frame =>  frame.isLoop || frame.isBreakable)) this.source += 'continue;\n';
+            if (this.frames.find(frame =>  frame.isLoop || frame.isIterable)) this.source += 'continue;\n';
             break;
         case 'control.wait': {
             const duration = this.localVariables.next();
