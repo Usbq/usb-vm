@@ -385,7 +385,9 @@ class Thread {
         // This check should literally never pass,
         // but as GarboMuffin once said, "just in case".
         if (i < 0) break;
-        if (!(stackFrames[i].isLoop || (iter ? stackFrames[i].isIterable : stackFrames[i].isBreakable))) continue;
+        if (!(stackFrames[i].isLoop || (iter ? stackFrames[i].isIterable : (
+          stackFrames[i].isBreakable || stackFrames[i].isIterable
+        )))) continue;
         loopFrameBlock = stackFrames[i].op.id;
         loopFrameIndex = i;
         break;

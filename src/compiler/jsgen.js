@@ -962,7 +962,11 @@ class JSGenerator {
             this.stopScript();
             break;
         case 'control.break':
-            if (this.frames.find(frame =>  frame.isLoop || frame.isBreakable)) this.source += 'break;\n';
+            if (this.frames.find(frame =>
+                frame.isLoop ||
+                frame.isBreakable ||
+                frame.isIterable
+            )) this.source += 'break;\n';
             break;
         case 'control.continue':
             if (this.frames.find(frame =>  frame.isLoop || frame.isIterable)) this.source += 'continue;\n';
