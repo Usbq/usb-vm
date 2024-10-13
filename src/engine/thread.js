@@ -429,6 +429,7 @@ class Thread {
         this.pushStack(afterLoop);
       }
 
+      // Clear breakData because it is stoopid
       delete stackFrame._breakData;
     }
 
