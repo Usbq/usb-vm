@@ -428,6 +428,8 @@ class Thread {
       if (afterLoop) {
         this.pushStack(afterLoop);
       }
+
+      delete stackFrame._breakData;
     }
 
     /**
