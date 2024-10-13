@@ -492,7 +492,9 @@ class JSGenerator {
                 source += `switch (${branchVariable}.branch) {\n`;
                 for (const index in node.substacks) {
                     source += `case ${+index}: {\n`;
-                    source += this.descendStackForSource(node.substacks[index], new Frame(false, node.breakable));
+                    const _frame = new Frame(false, node.breakable);
+                    _frame.isIterable = node.iterable;
+                    source += this.descendStackForSource(node.substacks[index], _frame);
                     source += `break;\n`;
                     source += `}\n`; // close case
                 }
@@ -887,7 +889,9 @@ class JSGenerator {
                 this.source += `switch (${branchVariable}.branch) {\n`;
                 for (const index in node.substacks) {
                     this.source += `case ${+index}: {\n`;
-                    this.descendStack(node.substacks[index], new Frame(false, node.breakable));
+                    const _frame = new Frame(false, node.breakable);
+                    _frame.isIterable = node.iterable;
+                    this.descendStack(node.substacks[index], _frame);
                     this.source += `break;\n`;
                     this.source += `}\n`; // close case
                 }

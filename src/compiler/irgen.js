@@ -1551,7 +1551,8 @@ class ScriptTreeGenerator {
             inputs,
             fields,
             substacks,
-            breakable: block.isBreakable ?? false
+            breakable: block.isBreakable ?? false,
+            iterable: block.isIterable ?? false
         };
     }
 
