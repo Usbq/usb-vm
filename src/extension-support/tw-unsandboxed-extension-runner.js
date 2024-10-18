@@ -136,13 +136,15 @@ const setupUnsandboxedExtensionAPI = (vm, pre) => new Promise(resolve => {
     Scratch.translate = createTranslate(vm);
 
     const ScratchExtensions =  createScratchX(Scratch);
+
+    // We want Scratch.gui even when it is loaded prematurly as it gives access to some fancy API's in the GUI
+    vm.emit('CREATE_UNSANDBOXED_EXTENSION_API', Scratch, pre);
     
     if (pre) {
         resolve({ Scratch, ScratchExtensions });
     } else {
         global.Scratch = Scratch;
         global.ScratchExtensions = ScratchExtensions;
-        vm.emit('CREATE_UNSANDBOXED_EXTENSION_API', Scratch);
     }
 });
 
