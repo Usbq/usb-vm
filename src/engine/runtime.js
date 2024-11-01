@@ -1391,6 +1391,7 @@ class Runtime extends EventEmitter {
                 colour: acceptInput ? '#FFFFFF' : categoryInfo.color1,
                 colourSecondary: acceptInput ? '#FFFFFF' : categoryInfo.color2,
                 colourTertiary: acceptInput ? '#FFFFFF' : categoryInfo.color3,
+                colourQuaternary: acceptInput ? '#FFFFFF' : categoryInfo.color4,
                 outputShape: ScratchBlocksConstants.OUTPUT_SHAPE_ROUND,
                 args0: [
                     {
@@ -1443,6 +1444,7 @@ class Runtime extends EventEmitter {
                 colour: categoryInfo.color1,
                 colourSecondary: categoryInfo.color2,
                 colourTertiary: categoryInfo.color3,
+                colourQuaternary: categoryInfo.color4,
                 outputShape: outputShape,
                 args0: [
                     {
@@ -1498,7 +1500,8 @@ class Runtime extends EventEmitter {
             extensions: [],
             colour: blockInfo.color1 ?? categoryInfo.color1,
             colourSecondary: blockInfo.color2 ?? categoryInfo.color2,
-            colourTertiary: blockInfo.color3 ?? categoryInfo.color3
+            colourTertiary: blockInfo.color3 ?? categoryInfo.color3,
+            colourQuaternary: blockInfo.color4 ?? categoryInfo.color4
         };
         const context = {
             // TODO: store this somewhere so that we can map args appropriately after translation.
@@ -1524,7 +1527,8 @@ class Runtime extends EventEmitter {
         if (
             blockJSON.colour === defaultExtensionColors[0] &&
             blockJSON.colourSecondary === defaultExtensionColors[1] &&
-            blockJSON.colourTertiary === defaultExtensionColors[2]
+            blockJSON.colourTertiary === defaultExtensionColors[2] &&
+            blockJSON.colourQuaternary === defaultExtensionColors[2]
         ) {
             blockJSON.extensions.push('default_extension_colors');
         }
