@@ -279,6 +279,15 @@ class Thread {
     }
 
     /**
+     * Thread status for a single-tick yield. This will not be cleared when the
+     * thread is resumed.
+     * @const
+     */
+    static get STATUS_PAUSED () {
+        return 5; // used by compiler
+    }
+
+    /**
      * @param {Target} target The target running the thread.
      * @param {string} topBlock ID of the thread's top block.
      * @returns {string} A unique ID for this target and thread.

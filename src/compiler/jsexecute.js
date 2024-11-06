@@ -171,7 +171,10 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         return '';
     }
 
-    while (thread.status === 2 /* STATUS_YIELD */ || thread.status === 3 /* STATUS_YIELD_TICK */) {
+    while (
+        thread.status === 2 /* STATUS_YIELD */ ||
+        thread.status === 3 /* STATUS_YIELD_TICK */
+    ) {
         // Yielded threads will run next iteration.
         if (thread.status === 2 /* STATUS_YIELD */) {
             thread.status = 0; // STATUS_RUNNING
@@ -631,7 +634,9 @@ runtimeFunctions.yieldThenCallGenerator = `const yieldThenCallGenerator = functi
  */
 const execute = thread => {
     globalState.thread = thread;
-    thread.generator.next();
+    if (thread.status !== 5 /* STATUS_PAUSED */) {
+        thread.generator.next();
+    }
 };
 
 const threadStack = [];

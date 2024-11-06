@@ -110,6 +110,10 @@ class Sequencer {
                     stoppedThread = true;
                     continue;
                 }
+                if (activeThread.status === Thread.STATUS_PAUSED) {
+                    // The thread is paused so no need to do any logic <3
+                    continue;
+                }
                 if (activeThread.status === Thread.STATUS_YIELD_TICK &&
                     !ranFirstTick) {
                     // Clear single-tick yield from the last call of `stepThreads`.
