@@ -117,7 +117,7 @@ class Sequencer {
                 if (activeThread.status === Thread.STATUS_YIELD_TICK &&
                     !ranFirstTick) {
                     // Clear single-tick yield from the last call of `stepThreads`.
-                    activeThread.status = Thread.STATUS_RUNNING;
+                    activeThread.setStatus(Thread.STATUS_RUNNING);
                 }
                 if (activeThread.status === Thread.STATUS_RUNNING ||
                     activeThread.status === Thread.STATUS_YIELD) {
@@ -192,7 +192,7 @@ class Sequencer {
 
             // Did the null follow a hat block?
             if (thread.stack.length === 0) {
-                thread.status = Thread.STATUS_DONE;
+                thread.setStatus(Thread.STATUS_DONE);
                 return;
             }
         }
@@ -223,7 +223,7 @@ class Sequencer {
             // If the thread has yielded or is waiting, yield to other threads.
             if (thread.status === Thread.STATUS_YIELD) {
                 // Mark as running for next iteration.
-                thread.status = Thread.STATUS_RUNNING;
+                thread.setStatus(Thread.STATUS_RUNNING);
                 // In warp mode, yielded blocks are re-executed immediately.
                 if (isWarpMode &&
                     thread.warpTimer.timeElapsed() <= Sequencer.WARP_TIME) {
@@ -252,7 +252,7 @@ class Sequencer {
 
                 if (thread.stack.length === 0) {
                     // No more stack to run!
-                    thread.status = Thread.STATUS_DONE;
+                    thread.setStatus(Thread.STATUS_DONE);
                     return;
                 }
 
@@ -332,7 +332,7 @@ class Sequencer {
         // In known warp-mode threads, only yield when time is up.
         if (thread.peekStackFrame().warpMode &&
             thread.warpTimer.timeElapsed() > Sequencer.WARP_TIME) {
-            thread.status = Thread.STATUS_YIELD;
+            thread.setStatus(Thread.STATUS_YIELD);
         } else {
             // Look for warp-mode flag on definition, and set the thread
             // to warp-mode if needed.
@@ -352,7 +352,7 @@ class Sequencer {
                 thread.peekStackFrame().warpMode = true;
             } else if (isRecursive) {
                 // In normal-mode threads, yield any time we have a recursive call.
-                thread.status = Thread.STATUS_YIELD;
+                thread.setStatus(Thread.STATUS_YIELD);
             }
         }
     }
@@ -365,7 +365,7 @@ class Sequencer {
         thread.stack = [];
         thread.stackFrame = [];
         thread.requestScriptGlowInFrame = false;
-        thread.status = Thread.STATUS_DONE;
+        thread.setStatus(Thread.STATUS_DONE);
         if (thread.isCompiled) {
             thread.procedures = null;
             thread.generator = null;

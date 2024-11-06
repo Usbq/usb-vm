@@ -168,6 +168,14 @@ class Thread {
          */
         this.stackFrames = [];
 
+
+        /**
+         * The previous status of the thread
+         * Used by the pause thread feature
+         * @type {number}
+         */
+        this.previousStatus = 0; /* Thread.STATUS_RUNNING */
+
         /**
          * Status of the thread, one of three states (below)
          * @type {number}
@@ -288,6 +296,15 @@ class Thread {
     }
 
     /**
+     * Sets the thread status
+     */
+    setStatus(newStatus) {
+        this.previousStatus = this.status;
+        this.status = newStatus;
+        // todo: Possibly make an event?
+    }
+
+    /**
      * @param {Target} target The target running the thread.
      * @param {string} topBlock ID of the thread's top block.
      * @returns {string} A unique ID for this target and thread.
@@ -364,7 +381,7 @@ class Thread {
         if (this.stack.length === 0) {
             // Clean up!
             this.requestScriptGlowInFrame = false;
-            this.status = Thread.STATUS_DONE;
+            this.setStatus(Thread.STATUS_DONE);
         }
     }
 
@@ -474,7 +491,7 @@ class Thread {
       }
 
       // "run util.yield", and restart the loop block
-      this.status = Thread.STATUS_YIELD;
+      this.setStatus(Thread.STATUS_YIELD);
     }
 
     // end of borrowed code

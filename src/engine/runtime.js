@@ -2253,7 +2253,10 @@ class Runtime extends EventEmitter {
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
-    // this is a WIP so it should be ignored
+    /**
+     * Set the "paused" status of the current project.
+     * @param {boolean} status The pause status of the project.
+     */
     setPause(status) {
         status = status || false;
         const didChange = this.paused !== status;
@@ -2263,8 +2266,15 @@ class Runtime extends EventEmitter {
                 this.ioDevices.clock.pause();
             }
             this.audioEngine.audioContext.suspend();
-        }
-        if (!status && didChange) {
+            for (let i = this.threads.length - 1; i > -1; i--) {
+                if (this.threads[i].status === 5 /* STATUS_PAUSED */) continue;
+                this._pauseThread(this.threads[i]);
+            }
+        } else if (didChange) {
+            for (let i = this.threads.length - 1; i > -1; i--) {
+                if (this.threads[i].status !== 5 /* STATUS_PAUSED */) continue;
+                this._pauseThread(this.threads[i]);
+            }
             this.audioEngine.audioContext.resume();
             this.ioDevices.clock.resume();
         }
@@ -2366,6 +2376,20 @@ class Runtime extends EventEmitter {
         this.threads.push(thread);
         return thread;
     }
+
+    /**
+     * Pause a thread, this toggles the pause status!
+     * PLEASE check the status before you use this!
+     * @param {!Thread} thread Thread object to restart.
+     */
+    _pauseThread(thread) {
+        if (thread.status === 5 /* STATUS_PAUSED */) {
+            thread.setStatus(thread.previousStatus);
+        } else {
+            thread.setStatus(5); // STATUS_PAUSED
+        }
+    }
+    _
 
     emitCompileError (target, error) {
         this.emit(Runtime.COMPILE_ERROR, target, error);

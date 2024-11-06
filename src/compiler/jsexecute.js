@@ -77,7 +77,7 @@ runtimeFunctions.waitThreads = `const waitThreads = function*(threads) {
             }
         }
         if (allWaiting) {
-            thread.status = 3; // STATUS_YIELD_TICK
+            thread.setStatus(3); // STATUS_YIELD_TICK
         }
 
         yield;
@@ -113,16 +113,16 @@ const waitPromise = function*(promise) {
     // enter STATUS_PROMISE_WAIT and yield
     // this will stop script execution until the promise handlers reset the thread status
     // because promise handlers might execute immediately, configure thread.status here
-    thread.status = 1; // STATUS_PROMISE_WAIT
+    thread.setStatus(1); // STATUS_PROMISE_WAIT
 
     promise
         .then(value => {
             returnValue = value;
-            thread.status = 0; // STATUS_RUNNING
+            thread.setStatus(0); // STATUS_RUNNING
         }, error => {
             globalState.log.warn('Promise rejected in compiled script:', error);
             returnValue = '' + error;
-            thread.status = 0; // STATUS_RUNNING
+            thread.setStatus(0); // STATUS_RUNNING
         });
 
     yield;
@@ -177,7 +177,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
     ) {
         // Yielded threads will run next iteration.
         if (thread.status === 2 /* STATUS_YIELD */) {
-            thread.status = 0; // STATUS_RUNNING
+            thread.setStatus(0); // STATUS_RUNNING
             // Yield back to the event loop when stuck or not in warp mode.
             if (!isWarp || isStuck()) {
                 yield;
