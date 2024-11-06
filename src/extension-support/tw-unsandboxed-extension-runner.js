@@ -1,4 +1,5 @@
 const ScratchCommon = require('./tw-extension-api-common');
+const createUnsandboxed = require('./usb-unsandboxed-object');
 const createScratchX = require('./tw-scratchx-compatibility-layer');
 const AsyncLimiter = require('../util/async-limiter');
 const createTranslate = require('./tw-l10n');
@@ -35,8 +36,9 @@ const setupUnsandboxedExtensionAPI = (vm, pre) => new Promise(resolve => {
         resolve(extensionObjects);
     });
 
-    // Create a new copy of global.Scratch for each extension
+    // Create a new copy of global.Scratch and global.Unsandboxed for each extension
     const Scratch = Object.assign({}, global.Scratch || {}, ScratchCommon);
+    const Unsandboxed = Object.assign({}, createUnsandboxed());
     Scratch.extensions = {
         isPremature: pre,
         isUSB: true,
@@ -139,10 +141,12 @@ const setupUnsandboxedExtensionAPI = (vm, pre) => new Promise(resolve => {
 
     // We want Scratch.gui even when it is loaded prematurly as it gives access to some fancy API's in the GUI
     vm.emit('CREATE_UNSANDBOXED_EXTENSION_API', Scratch, pre);
-    
+    vm.emit('CREATE_USB_API', Unsandboxed, pre);
+
     if (pre) {
-        resolve({ Scratch, ScratchExtensions });
+        resolve({ Scratch, ScratchExtensions, Unsandboxed });
     } else {
+        global.Unsandboxed = Unsandboxed;
         global.Scratch = Scratch;
         global.ScratchExtensions = ScratchExtensions;
     }
