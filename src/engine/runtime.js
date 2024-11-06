@@ -2253,6 +2253,16 @@ class Runtime extends EventEmitter {
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
+    _sortThreadsToTarget() {
+      const targets = Object.create(null);
+      for (let i = this.threads.length - 1; i > -1; i--) {
+          const thread = this.threads[i];
+          targets[thread.target.id] ??= { target: thread.target, threads: [] };
+          targets[thread.target.id].threads.push(thread);
+      }
+      return targets;
+    }
+
     /**
      * Set the "paused" status of the current project.
      * @param {boolean} status The pause status of the project.
@@ -2261,20 +2271,29 @@ class Runtime extends EventEmitter {
         status = status || false;
         const didChange = this.paused !== status;
         this.paused = status;
+        const targets = Object.values(this._sortThreadsToTarget());
+        // Pause all the targets with RUNNING threads
+        for (let i = targets.length - 1; i > -1; i--) {
+            const target = targets[i];
+            if (target.target.paused === status) continue;
+            target.target.setPause(status, target.threads);
+        }
+        // The for loop above will miss any target without any threads running
+        // So we iterate over all the targets and pause them
+        for (let i = this.targets.length - 1; i > -1; i--) {
+            // If its paused then we can assume its threads are paused
+            if (this.targets[i].paused === status) continue;
+            // Unlike the above for loop we don't have a list of threads to pause
+            // so we pass an empty array, it is safe to assume there are no threads unpaused
+            // after the above for loop
+            this.targets[i].setPause(status, []);
+        }
         if (status) {
             if (!this.ioDevices.clock._paused) {
                 this.ioDevices.clock.pause();
             }
             this.audioEngine.audioContext.suspend();
-            for (let i = this.threads.length - 1; i > -1; i--) {
-                if (this.threads[i].status === 5 /* STATUS_PAUSED */) continue;
-                this._pauseThread(this.threads[i]);
-            }
         } else if (didChange) {
-            for (let i = this.threads.length - 1; i > -1; i--) {
-                if (this.threads[i].status !== 5 /* STATUS_PAUSED */) continue;
-                this._pauseThread(this.threads[i]);
-            }
             this.audioEngine.audioContext.resume();
             this.ioDevices.clock.resume();
         }
@@ -2782,8 +2801,8 @@ class Runtime extends EventEmitter {
      * Start all threads that start with the green flag.
      */
     greenFlag () {
+        // pausing is done in stopAll
         this.stopAll();
-        this.setPause(false);
         this.emit(Runtime.PROJECT_START);
         this.updateCurrentMSecs();
         this.ioDevices.clock.resetProjectTimer();
@@ -2821,6 +2840,7 @@ class Runtime extends EventEmitter {
         // Remove all remaining threads from executing in the next tick.
         this.threads = [];
         this.threadMap.clear();
+        this.setPause(false);
 
         this.resetRunId();
     }
@@ -3272,7 +3292,7 @@ class Runtime extends EventEmitter {
     storeProjectOptions () {
         const options = this.generateDifferingProjectOptions();
         // TODO: translate
-        const text = `Configuration for https://turbowarp.org/\nYou can move, resize, and minimize this comment, but don't edit it by hand. This comment can be deleted to remove the stored settings.\n${ExtendedJSON.stringify(options)}${COMMENT_CONFIG_MAGIC}`;
+        const text = `Configuration for https://alpha.unsandboxed.org/\nYou can move, resize, and minimize this comment, but don't edit it by hand. This comment can be deleted to remove the stored settings.\n${ExtendedJSON.stringify(options)}${COMMENT_CONFIG_MAGIC}`;
         const existingComment = this.findProjectOptionsComment();
         if (existingComment) {
             existingComment.text = text;
@@ -3729,7 +3749,7 @@ class Runtime extends EventEmitter {
                 label: extensionBlockInfo.text
             };
         }
-        
+
         // TODO: we may want to format the label in a locale-specific way.
         return {
             category: 'extension', // This assumes that all extensions have the same monitor color.
