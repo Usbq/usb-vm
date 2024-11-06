@@ -103,6 +103,7 @@ class Sequencer {
             const threads = this.runtime.threads;
             for (let i = 0; i < threads.length; i++) {
                 const activeThread = this.activeThread = threads[i];
+                console.log('Managing thread with status', activeThread.status);
                 // Check if the thread is done so it is not executed.
                 if (activeThread.stack.length === 0 ||
                     activeThread.status === Thread.STATUS_DONE) {
@@ -185,6 +186,10 @@ class Sequencer {
             return;
         }
 
+        // Don't step a paused thread
+        console.log('Stepping thread with status of', thread.status);
+        if (thread.status === Thread.STATUS_PAUSED) return;
+
         let currentBlockId = thread.peekStack();
         if (!currentBlockId) {
             // A "null block" - empty branch.
@@ -220,6 +225,8 @@ class Sequencer {
                 execute(this, thread);
             }
             thread.blockGlowInFrame = currentBlockId;
+            // If the thread is paused then we just shouldnt continue with logic
+            if (thread.status === Thread.STATUS_PAUSED) return;
             // If the thread has yielded or is waiting, yield to other threads.
             if (thread.status === Thread.STATUS_YIELD) {
                 // Mark as running for next iteration.

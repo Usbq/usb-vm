@@ -1,4 +1,5 @@
 const log = require('../util/log');
+const uid = require('../util/uid');
 
 /**
  * Recycle bin for empty stackFrame objects
@@ -224,6 +225,17 @@ class Thread {
         this.triedToCompile = false;
 
         this.isCompiled = false;
+
+        /**
+         * The threads id
+         */
+        this.id = uid();
+        /**
+         * The threads "name"
+         * Initially this is the same as the ID
+         * (for extensions)
+         */
+        this.name = this.id;
 
         // compiler data
         // these values only make sense if isCompiled == true

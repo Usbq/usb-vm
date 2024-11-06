@@ -2334,6 +2334,15 @@ class Runtime extends EventEmitter {
      */
     _pushThread (id, target, opts) {
         const thread = new Thread(id);
+        if (
+            // If the project or sprite is paused then the new thread should be paused
+            (this.paused ||
+             target.paused) &&
+            // We dont want to pause threads in the flyout
+            target.blocks.getBlock(id)
+        ) {
+            thread.status = Thread.STATUS_PAUSED;
+        }
         thread.target = target;
         thread.stackClick = Boolean(opts && opts.stackClick);
         thread.updateMonitor = Boolean(opts && opts.updateMonitor);

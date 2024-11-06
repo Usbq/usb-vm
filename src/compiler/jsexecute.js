@@ -137,6 +137,7 @@ const isPromise = value => (
 );
 const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId, branchInfo) {
     const thread = globalState.thread;
+    while(thread.status === 5 /* STATUS_PAUSED */) yield;
     const blockUtility = globalState.blockUtility;
     const stackFrame = branchInfo ? branchInfo.stackFrame : {};
 
@@ -191,6 +192,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         if (isPromise(returnValue)) {
             returnValue = finish(yield* waitPromise(returnValue));
             if (useFlags) hasResumedFromPromise = true;
+            while(thread.status === 5 /* STATUS_PAUSED */) yield;
             return returnValue;
         }
 
@@ -199,6 +201,8 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
             return finish('');
         }
     }
+
+    while(thread.status === 5 /* STATUS_PAUSED */) yield;
 
     return finish(returnValue);
 }`;
