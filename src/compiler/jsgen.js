@@ -969,7 +969,7 @@ class JSGenerator {
             )) this.source += 'break;\n';
             break;
         case 'control.continue':
-            if (this.frames.find(frame =>  frame.isLoop || frame.isIterable)) this.source += 'continue;\n';
+            if (this.frames.find(frame => frame.isLoop || frame.isIterable)) this.source += 'continue;\n';
             break;
         case 'control.wait': {
             const duration = this.localVariables.next();

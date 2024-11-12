@@ -1505,6 +1505,8 @@ const checkPlatformCompatibility = (json, runtime) => {
             pending--;
             if (pending === 0) {
                 if (!isNativePlatform) {
+                    // JS hoisting fix
+                    // eslint-disable-next-line
                     applyCompatibilityOptions(runtime);
                 }
                 resolve();
@@ -1517,13 +1519,13 @@ const checkPlatformCompatibility = (json, runtime) => {
  * Attempts to apply legacy runtime settings that are used by
  * the majority of TurboWarp and Scratch projects.
  * These will be overwritten if a magic comment is found.
- * @param {Runtime} runtime 
+ * @param {Runtime} runtime
  */
-const applyCompatibilityOptions = (runtime) => {
+const applyCompatibilityOptions = runtime => {
     runtime.setFramerate(30);
     runtime.setStageSize(480, 360);
-    runtime.setRuntimeOptions({"fencing": true});
-}
+    runtime.setRuntimeOptions({fencing: true});
+};
 
 /**
  * Deserialize the specified representation of a VM runtime and loads it into the provided runtime instance.

@@ -310,7 +310,7 @@ class Thread {
     /**
      * Sets the thread status
      */
-    setStatus(newStatus) {
+    setStatus (newStatus) {
         this.previousStatus = this.status;
         this.status = newStatus;
         // todo: Possibly make an event?
@@ -398,7 +398,6 @@ class Thread {
     }
 
 
-
     /**
      * Get top stack item.
      * @return {?string} Block ID on top of stack.
@@ -416,27 +415,27 @@ class Thread {
      * @returns {boolean|Array<any, number>}
      */
     static getLoopFrame (thread, iter) {
-      const stackFrames = thread.stackFrames, frameCount = stackFrames.length;
-      let loopFrameBlock = null, loopFrameIndex;
+        const stackFrames = thread.stackFrames; const frameCount = stackFrames.length;
+        let loopFrameBlock = null; let loopFrameIndex;
 
-      for (let i = frameCount - 1; i >= 0; i--) {
+        for (let i = frameCount - 1; i >= 0; i--) {
         // This check should literally never pass,
         // but as GarboMuffin once said, "just in case".
-        if (i < 0) break;
-        if (!(stackFrames[i].isLoop || (iter ? stackFrames[i].isIterable : (
-          stackFrames[i].isBreakable || stackFrames[i].isIterable
-        )))) continue;
-        loopFrameBlock = stackFrames[i].op.id;
-        loopFrameIndex = i;
-        break;
-      }
+            if (i < 0) break;
+            if (!(stackFrames[i].isLoop || (iter ? stackFrames[i].isIterable : (
+                stackFrames[i].isBreakable || stackFrames[i].isIterable
+            )))) continue;
+            loopFrameBlock = stackFrames[i].op.id;
+            loopFrameIndex = i;
+            break;
+        }
 
-      if (!loopFrameBlock) {
+        if (!loopFrameBlock) {
         // We are not inside of a loop block.
-        return false;
-      }
+            return false;
+        }
 
-      return [loopFrameBlock, loopFrameIndex];
+        return [loopFrameBlock, loopFrameIndex];
     }
 
     /**
@@ -447,63 +446,63 @@ class Thread {
      * Break the current executing loop.
      */
     breakCurrentLoop () {
-      const blocks = this.blockContainer, stackFrame = this.peekStackFrame();
+        const blocks = this.blockContainer; const stackFrame = this.peekStackFrame();
 
-      if (!stackFrame._breakData) {
-        let frameData = false;
-        if (!(frameData = Thread.getLoopFrame(this))) return;
-        const loopFrameBlock = frameData[0];
-        const afterLoop = blocks.getBlock(loopFrameBlock).next;
-        stackFrame._breakData = { loopFrameBlock, afterLoop };
-      }
+        if (!stackFrame._breakData) {
+            let frameData = false;
+            if (!(frameData = Thread.getLoopFrame(this))) return;
+            const loopFrameBlock = frameData[0];
+            const afterLoop = blocks.getBlock(loopFrameBlock).next;
+            stackFrame._breakData = {loopFrameBlock, afterLoop};
+        }
 
-      const { loopFrameBlock, afterLoop } = stackFrame._breakData;
+        const {loopFrameBlock, afterLoop} = stackFrame._breakData;
 
-      // Remove any remaining blocks within the remaining stack
-      // until we reach the loop block.
-      let _;
-      while ((_ = this.stack.at(-1)) !== loopFrameBlock) {
+        // Remove any remaining blocks within the remaining stack
+        // until we reach the loop block.
+        let _;
+        while ((_ = this.stack.at(-1)) !== loopFrameBlock) {
         // We don't want to exit from a procedure
-        if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
+            if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
+            this.popStack();
+        }
+
+        // Remove the remaining loop block.
         this.popStack();
-      }
 
-      // Remove the remaining loop block.
-      this.popStack();
+        // If there's a block after the loop, continue
+        // from there.
+        if (afterLoop) {
+            this.pushStack(afterLoop);
+        }
 
-      // If there's a block after the loop, continue
-      // from there.
-      if (afterLoop) {
-        this.pushStack(afterLoop);
-      }
-
-      // Clear breakData because it is stoopid
-      delete stackFrame._breakData;
+        // Clear breakData because it is stoopid
+        delete stackFrame._breakData;
     }
 
     /**
      * Continue the current running loop onto the next iteration.
      */
     continueCurrentLoop () {
-      const blocks = this.blockContainer, stackFrame = this.peekStackFrame();
+        const blocks = this.blockContainer; const stackFrame = this.peekStackFrame();
 
-      if (!stackFrame._continueData) {
-        let frameData = false;
-        if (!(frameData = Thread.getLoopFrame(this))) return;
-        stackFrame._continueData = frameData[0];
-      }
+        if (!stackFrame._continueData) {
+            let frameData = false;
+            if (!(frameData = Thread.getLoopFrame(this))) return;
+            stackFrame._continueData = frameData[0];
+        }
 
-      // Pop the stack until we are at the loop block
-      // (we make sure to check if the stack exists though to prevent errors)
-      let _;
-      while(this.stack[0] && (_ = this.stack.at(-1)) !== stackFrame._continueData) {
+        // Pop the stack until we are at the loop block
+        // (we make sure to check if the stack exists though to prevent errors)
+        let _;
+        while (this.stack[0] && (_ = this.stack.at(-1)) !== stackFrame._continueData) {
         // Same as break.
-        if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
-        this.popStack();
-      }
+            if (blocks.getBlock(_)?.opcode === 'procedures_call') return;
+            this.popStack();
+        }
 
-      // "run util.yield", and restart the loop block
-      this.setStatus(Thread.STATUS_YIELD);
+        // "run util.yield", and restart the loop block
+        this.setStatus(Thread.STATUS_YIELD);
     }
 
     // end of borrowed code

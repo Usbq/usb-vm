@@ -89,7 +89,7 @@ class Target extends EventEmitter {
      * @param {Array<import('./thread.js')>} threads An array of threads to pause,
        (Note these must be owned by the sprite)
      */
-    setPause(status, threads) {
+    setPause (status, threads) {
         status = status || false;
         const statusChanged = status !== this.paused;
         this.paused = status;

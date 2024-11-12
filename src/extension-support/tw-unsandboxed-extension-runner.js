@@ -29,7 +29,7 @@ const parseURL = url => {
 const setupUnsandboxedExtensionAPI = (vm, pre) => new Promise(resolve => {
     pre = pre || false;
     const extensionObjects = [];
-    const register = pre ? (_ => {
+    const register = pre ? (() => {
         throw new Error('Unable to register extension as this is a pre-mature instance.');
     }) : (extensionObject => {
         extensionObjects.push(extensionObject);
@@ -137,14 +137,14 @@ const setupUnsandboxedExtensionAPI = (vm, pre) => new Promise(resolve => {
 
     Scratch.translate = createTranslate(vm);
 
-    const ScratchExtensions =  createScratchX(Scratch);
+    const ScratchExtensions = createScratchX(Scratch);
 
     // We want Scratch.gui even when it is loaded prematurly as it gives access to some fancy API's in the GUI
     vm.emit('CREATE_UNSANDBOXED_EXTENSION_API', Scratch, pre);
     vm.emit('CREATE_USB_API', Unsandboxed, pre);
 
     if (pre) {
-        resolve({ Scratch, ScratchExtensions, Unsandboxed });
+        resolve({Scratch, ScratchExtensions, Unsandboxed});
     } else {
         global.Unsandboxed = Unsandboxed;
         global.Scratch = Scratch;

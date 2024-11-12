@@ -136,7 +136,7 @@ class ExtensionManager {
      * Prematurely load the "Scratch" object.
      * @return Promise<Object> The Scratch object/
      */
-    _getScratch() {
+    _getScratch () {
         return require('./tw-unsandboxed-extension-runner').setupUnsandboxedExtensionAPI(this.vm, true);
     }
 

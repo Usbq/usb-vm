@@ -1,7 +1,8 @@
 const ContextMenuContext = require('./context-menu-context');
 const Util = require('../util/usb-util');
-const hasOwn = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop):
-const catchError = async (promise, errors) => {
+const hasOwn = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
+/* eslint-disable no-undefined */
+const catchError = (promise, errors) => {
     if (!(promise instanceof Promise)) {
         throw new TypeError('Expected "promise" to be PromiseLike.');
     }
@@ -21,8 +22,9 @@ const catchError = async (promise, errors) => {
         return [e, undefined];
     });
 };
+/* eslint-enable no-undefined */
 
-module.exports = function() {
+module.exports = function () {
     return {
         ContextMenuContext,
         Util,

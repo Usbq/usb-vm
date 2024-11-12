@@ -2253,21 +2253,21 @@ class Runtime extends EventEmitter {
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
-    _sortThreadsToTarget() {
-      const targets = Object.create(null);
-      for (let i = this.threads.length - 1; i > -1; i--) {
-          const thread = this.threads[i];
-          targets[thread.target.id] ??= { target: thread.target, threads: [] };
-          targets[thread.target.id].threads.push(thread);
-      }
-      return targets;
+    _sortThreadsToTarget () {
+        const targets = Object.create(null);
+        for (let i = this.threads.length - 1; i > -1; i--) {
+            const thread = this.threads[i];
+            targets[thread.target.id] ??= {target: thread.target, threads: []};
+            targets[thread.target.id].threads.push(thread);
+        }
+        return targets;
     }
 
     /**
      * Set the "paused" status of the current project.
      * @param {boolean} status The pause status of the project.
      */
-    setPause(status) {
+    setPause (status) {
         status = status || false;
         const didChange = this.paused !== status;
         this.paused = status;
@@ -2308,7 +2308,7 @@ class Runtime extends EventEmitter {
      * other properties and prevents them from becoming dysynced. This will not
      * update audioSettings.volume if the new volume is 0 (muted), pass -1 to unmute the value.
      */
-    setVolume(volume) {
+    setVolume (volume) {
         if (volume === this.audioSettings.volume) return false;
         if (volume === -1 && this.audioSettings.muted) {
             volume = this.audioSettings.volume;
@@ -2410,14 +2410,14 @@ class Runtime extends EventEmitter {
      * PLEASE check the status before you use this!
      * @param {!Thread} thread Thread object to restart.
      */
-    _pauseThread(thread) {
+    _pauseThread (thread) {
         if (thread.status === 5 /* STATUS_PAUSED */) {
             thread.setStatus(thread.previousStatus);
         } else {
             thread.setStatus(5); // STATUS_PAUSED
         }
     }
-    _
+    _;
 
     emitCompileError (target, error) {
         this.emit(Runtime.COMPILE_ERROR, target, error);
